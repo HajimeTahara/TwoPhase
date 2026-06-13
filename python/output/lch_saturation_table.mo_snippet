@@ -1,25 +1,5 @@
-within TwoPhaseMedia;
-partial package LCH "液体メタン (CH₄) 媒体パッケージ"
-  extends TwoPhaseMedia.Interfaces.PartialTwoPhaseMedium(
-    mediumName  = "Liquid Methane (CH4)",
-    singleState = false);
-
-  // =====================================================================
-  // 物質定数
-  // =====================================================================
-  constant MolarMass        MM_const         = 0.016043 "モル質量 [kg/mol]";
-  constant Temperature      T_critical       = 190.564  "臨界温度 [K]";
-  constant AbsolutePressure p_critical       = 4.5992e6 "臨界圧力 [Pa]";
-  constant Density          d_critical       = 162.66   "臨界密度 [kg/m³]";
-  constant Temperature      T_triple         = 90.694   "三重点温度 [K]";
-  constant AbsolutePressure p_triple         = 11696.0  "三重点圧力 [Pa]";
-  constant Temperature      T_normal_boiling = 111.66   "常圧沸点 [K] (101325 Pa)";
-
-  // =====================================================================
-  // 飽和テーブル（CoolProp/Methane, 100 点, 対数圧力グリッド）
-  // 生成スクリプト: python/methane/saturation_table.py
+  // --- 飽和テーブル（CoolProp/Methane, 100 点, 対数圧力グリッド）---
   // p: 1.181e+04 Pa ~ 4.576e+06 Pa
-  // =====================================================================
   constant Integer sat_n = 100;
 
   constant Real sat_p[sat_n](each unit="Pa") =
@@ -165,49 +145,3 @@ partial package LCH "液体メタン (CH₄) 媒体パッケージ"
     45.98773, 49.729735, 53.943867, 58.742501, 64.288103,
     70.831439, 78.797884, 89.025375, 103.70489, 138.58183}
   "飽和蒸気密度 [kg/m³]";
-
-  // =====================================================================
-  // 関数実装（このパッケージが提供するのはここだけ）
-  // =====================================================================
-
-  redeclare function extends molarMass
-    "メタンのモル質量を返す（定数）"
-  algorithm
-    MM := MM_const;
-  end molarMass;
-
-  redeclare function extends setSat_p
-    "飽和テーブルから線形補間で飽和物性を返す"
-  algorithm
-    sat.psat     := p;
-    sat.Tsat     := interpolate1D(sat_p, sat_T,        p);
-    sat.h_bubble := interpolate1D(sat_p, sat_h_bubble, p);
-    sat.h_dew    := interpolate1D(sat_p, sat_h_dew,    p);
-    sat.d_bubble := interpolate1D(sat_p, sat_d_bubble, p);
-    sat.d_dew    := interpolate1D(sat_p, sat_d_dew,    p);
-  end setSat_p;
-
-  annotation (Documentation(info="<html>
-<p>
-液体メタン (LCH: Liquid CHane, CH₄) の熱物性パッケージ。
-</p>
-<h4>実装方針</h4>
-<p>
-このパッケージは <b>物質固有のデータ入力のみ</b> を担う。
-</p>
-<ul>
-<li>二相域の計算ロジック（密度・温度・乾き度・ボイド率）は
-    <code>PartialTwoPhaseMedium</code> に実装済み</li>
-<li>このパッケージが実装する関数: <code>setSat_p</code>（飽和テーブル補間）,
-    <code>molarMass</code>（定数）のみ</li>
-<li>単相域（<code>densitySinglePhase</code>, <code>temperatureSinglePhase</code>）は
-    <code>python/methane/export.py</code> で 2D テーブルを生成後に追加する</li>
-</ul>
-<h4>物質定数</h4>
-<ul>
-<li>モル質量: 16.043 g/mol</li>
-<li>臨界温度: 190.564 K / 臨界圧力: 4.5992 MPa</li>
-<li>三重点温度: 90.694 K / 常圧沸点: 111.66 K</li>
-</ul>
-</html>"));
-end LCH;

@@ -23,26 +23,35 @@ partial package PartialTwoPhaseMedium
   type ThermalConductivity    = Modelica.Units.SI.ThermalConductivity;
 
   // =====================================================================
-  // 基礎レコード（具体的流体で redeclare）
+  // 基礎レコード
+  //
+  // 共通フィールドをここで定義することで、このパッケージ内の関数が
+  // ThermodynamicState / SaturationProperties のフィールドを直接参照できる。
+  // 具体的流体は redeclare record extends で追加フィールドを設けてもよい。
   // =====================================================================
   replaceable record ThermodynamicState
-    "熱力学状態レコード（具体的流体で拡張）"
+    "熱力学状態レコード（p, h, phase を保持）"
+    AbsolutePressure p          "圧力 [Pa]";
+    SpecificEnthalpy h          "比エンタルピー [J/kg]";
+    Integer phase(min=0, max=2) "相状態: 1=単相, 2=二相, 0=不明";
   end ThermodynamicState;
 
   replaceable record SaturationProperties
-    "飽和物性レコード（具体的流体で拡張）"
-    AbsolutePressure psat "飽和圧力 [Pa]";
-    Temperature      Tsat "飽和温度 [K]";
+    "飽和物性レコード"
+    AbsolutePressure psat     "飽和圧力 [Pa]";
+    Temperature      Tsat     "飽和温度 [K]";
+    SpecificEnthalpy h_bubble "飽和液比エンタルピー [J/kg]";
+    SpecificEnthalpy h_dew    "飽和蒸気比エンタルピー [J/kg]";
+    Density          d_bubble "飽和液密度 [kg/m³]";
+    Density          d_dew    "飽和蒸気密度 [kg/m³]";
   end SaturationProperties;
 
   // =====================================================================
   // BaseProperties モデル
   //
-  // 設計方針:
-  //   - 普遍的な熱力学恒等式はこのクラスに記述する
-  //   - 流体固有の物性算出（d, T, phase, MM）はパッケージ関数に委譲する
-  //   - 具体的流体は replaceable 関数を実装するだけでよく、
-  //     BaseProperties の redeclare は不要
+  // 普遍的な熱力学恒等式をここで定義する。
+  // 流体固有の算出（d, T, phase, MM）はパッケージ関数に委譲する。
+  // 具体的流体は replaceable 関数を実装するだけでよい。
   // =====================================================================
   partial model BaseProperties
     "二相媒体の基礎物性（p, h 独立変数）"
@@ -50,156 +59,183 @@ partial package PartialTwoPhaseMedium
     connector InputAbsolutePressure = input Modelica.Units.SI.AbsolutePressure;
     connector InputSpecificEnthalpy = input Modelica.Units.SI.SpecificEnthalpy;
 
-    // 独立変数
     InputAbsolutePressure p "圧力 [Pa]";
     InputSpecificEnthalpy h "比エンタルピー [J/kg]";
 
-    // 計算物性
     Density             d   "密度 [kg/m³]";
     Temperature         T   "温度 [K]";
     SpecificInternalEnergy u   "比内部エネルギー [J/kg]";
     SpecificHeatCapacity   R_s "比気体定数 [J/(kg·K)]";
     MolarMass              MM  "モル質量 [kg/mol]";
 
-    // 相状態
     Integer phase(min=0, max=2, start=1)
       "相状態: 1 = 単相, 2 = 二相, 0 = 不明";
 
-    // 熱力学状態
     ThermodynamicState state "熱力学状態レコード";
 
     parameter Boolean preferredMediumStates = false
-      "= true のとき StateSelect.prefer を p, h に付与"
       annotation (Evaluate=true, Dialog(tab="Advanced"));
 
   equation
-    // 流体固有の物性算出（具体的流体が replaceable 関数で実装）
     state = setState_ph(p, h);
     d     = density(state);
     T     = temperature(state);
     phase = phaseOf(state);
     MM    = molarMass(state);
-
-    // 普遍的熱力学恒等式（すべての媒体で成立、ここで一度だけ定義）
+    // 普遍的熱力学恒等式
     u   = h - p / d;
     R_s = Modelica.Constants.R / MM;
 
-    annotation (Documentation(info="<html>
-<p>
-気液二相媒体の基礎物性モデル（<code>p</code>, <code>h</code> 独立変数）。
-</p>
-<h4>方程式分担</h4>
-<ul>
-<li><b>PartialTwoPhaseMedium（本クラス）:</b>
-  <code>u = h - p/d</code>,
-  <code>R_s = R/MM</code> — 普遍的熱力学恒等式</li>
-<li><b>具体的流体パッケージ（LCH 等）:</b>
-  <code>setState_ph</code>, <code>density</code>, <code>temperature</code>,
-  <code>phaseOf</code>, <code>molarMass</code> を実装し
-  <code>d</code>, <code>T</code>, <code>phase</code>, <code>MM</code> を決定する</li>
-</ul>
-</html>"));
   end BaseProperties;
 
   // =====================================================================
-  // 関数インターフェース（具体的流体で redeclare 実装）
+  // ユーティリティ関数
   // =====================================================================
 
-  replaceable function setState_ph
-    "p, h から熱力学状態を生成する（主要ルックアップ関数）"
-    input  AbsolutePressure   p "圧力 [Pa]";
-    input  SpecificEnthalpy   h "比エンタルピー [J/kg]";
-    output ThermodynamicState state;
+  function interpolate1D
+    "1次元テーブルの線形補間（範囲外はクランプ）"
+    input  Real xTable[:] "独立変数テーブル（昇順）";
+    input  Real yTable[:] "従属変数テーブル（xTable と同サイズ）";
+    input  Real x         "補間点";
+    output Real y         "補間値";
+  protected
+    Integer n = size(xTable, 1);
+    Integer i;
   algorithm
-    assert(false, "setState_ph: 具体的流体パッケージで実装してください");
+    if x <= xTable[1] then
+      y := yTable[1];
+    elseif x >= xTable[n] then
+      y := yTable[n];
+    else
+      i := 1;
+      while i < n - 1 and x > xTable[i + 1] loop
+        i := i + 1;
+      end while;
+      y := yTable[i] + (yTable[i + 1] - yTable[i]) *
+           (x - xTable[i]) / (xTable[i + 1] - xTable[i]);
+    end if;
+  end interpolate1D;
+
+  // =====================================================================
+  // 熱力学状態関数（基底クラスに実装、具体的流体は変更不要）
+  // =====================================================================
+
+  function setState_ph
+    "p, h から熱力学状態を生成する（飽和テーブルで相判定）"
+    input  AbsolutePressure   p;
+    input  SpecificEnthalpy   h;
+    output ThermodynamicState state;
+  protected
+    SaturationProperties sat;
+  algorithm
+    state.p := p;
+    state.h := h;
+    sat := setSat_p(p);
+    if h <= sat.h_bubble then
+      state.phase := 1;      // 過冷却液
+    elseif h >= sat.h_dew then
+      state.phase := 1;      // 過熱蒸気
+    else
+      state.phase := 2;      // 気液二相
+    end if;
   end setState_ph;
 
-  replaceable function density
-    "熱力学状態から密度を返す [kg/m³]"
-    input  ThermodynamicState state;
-    output Density            d;
-  algorithm
-    assert(false, "density: 具体的流体パッケージで実装してください");
-  end density;
-
-  replaceable function temperature
-    "熱力学状態から温度を返す [K]"
-    input  ThermodynamicState state;
-    output Temperature        T;
-  algorithm
-    assert(false, "temperature: 具体的流体パッケージで実装してください");
-  end temperature;
-
-  replaceable function phaseOf
-    "熱力学状態から相状態を返す (1=単相, 2=二相)"
-    input  ThermodynamicState state;
-    output Integer            phase(min=0, max=2);
-  algorithm
-    assert(false, "phaseOf: 具体的流体パッケージで実装してください");
-  end phaseOf;
-
-  replaceable function molarMass
-    "モル質量を返す [kg/mol]"
-    input  ThermodynamicState state;
-    output MolarMass          MM;
-  algorithm
-    assert(false, "molarMass: 具体的流体パッケージで実装してください");
-  end molarMass;
-
-  replaceable function pressure
+  function pressure
     "熱力学状態から圧力を返す [Pa]"
     input  ThermodynamicState state;
     output AbsolutePressure   p;
   algorithm
-    assert(false, "pressure: 具体的流体パッケージで実装してください");
+    p := state.p;
   end pressure;
 
-  replaceable function vapourQuality
-    "乾き度 x を返す（単相では 0 または 1）"
+  function phaseOf
+    "熱力学状態から相状態を返す (1=単相, 2=二相)"
+    input  ThermodynamicState state;
+    output Integer            phase(min=0, max=2);
+  algorithm
+    phase := state.phase;
+  end phaseOf;
+
+  function vapourQuality
+    "乾き度 x を返す（単相: 0=液, 1=蒸気）"
     input  ThermodynamicState state;
     output Real x(unit="1", min=0, max=1);
+  protected
+    SaturationProperties sat;
   algorithm
-    assert(false, "vapourQuality: 具体的流体パッケージで実装してください");
+    sat := setSat_p(state.p);
+    if state.phase == 2 then
+      x := max(0.0, min(1.0,
+             (state.h - sat.h_bubble) / (sat.h_dew - sat.h_bubble)));
+    else
+      x := if state.h <= sat.h_bubble then 0.0 else 1.0;
+    end if;
   end vapourQuality;
 
-  replaceable function setSat_p
-    "圧力から飽和物性を返す"
-    input  AbsolutePressure     p;
-    output SaturationProperties sat;
+  function density
+    "密度を返す [kg/m³]（二相: 混合密度式; 単相: densitySinglePhase に委譲）"
+    input  ThermodynamicState state;
+    output Density            d;
+  protected
+    SaturationProperties sat;
+    Real x;
   algorithm
-    assert(false, "setSat_p: 具体的流体パッケージで実装してください");
-  end setSat_p;
+    if state.phase == 2 then
+      sat := setSat_p(state.p);
+      x   := max(0.0, min(1.0,
+               (state.h - sat.h_bubble) / (sat.h_dew - sat.h_bubble)));
+      // HEM 混合密度: 1/d = x/ρv + (1-x)/ρl
+      d := 1.0 / (x / sat.d_dew + (1.0 - x) / sat.d_bubble);
+    else
+      d := densitySinglePhase(state.p, state.h);
+    end if;
+  end density;
 
-  replaceable function bubbleDensity
+  function temperature
+    "温度を返す [K]（二相: 飽和温度; 単相: temperatureSinglePhase に委譲）"
+    input  ThermodynamicState state;
+    output Temperature        T;
+  protected
+    SaturationProperties sat;
+  algorithm
+    if state.phase == 2 then
+      sat := setSat_p(state.p);
+      T   := sat.Tsat;
+    else
+      T := temperatureSinglePhase(state.p, state.h);
+    end if;
+  end temperature;
+
+  function bubbleDensity
     "飽和液密度を返す [kg/m³]"
     input  SaturationProperties sat;
     output Density              dl;
   algorithm
-    assert(false, "bubbleDensity: 具体的流体パッケージで実装してください");
+    dl := sat.d_bubble;
   end bubbleDensity;
 
-  replaceable function dewDensity
+  function dewDensity
     "飽和蒸気密度を返す [kg/m³]"
     input  SaturationProperties sat;
     output Density              dv;
   algorithm
-    assert(false, "dewDensity: 具体的流体パッケージで実装してください");
+    dv := sat.d_dew;
   end dewDensity;
 
-  replaceable function bubbleEnthalpy
+  function bubbleEnthalpy
     "飽和液比エンタルピーを返す [J/kg]"
     input  SaturationProperties sat;
     output SpecificEnthalpy     hl;
   algorithm
-    assert(false, "bubbleEnthalpy: 具体的流体パッケージで実装してください");
+    hl := sat.h_bubble;
   end bubbleEnthalpy;
 
-  replaceable function dewEnthalpy
+  function dewEnthalpy
     "飽和蒸気比エンタルピーを返す [J/kg]"
     input  SaturationProperties sat;
     output SpecificEnthalpy     hv;
   algorithm
-    assert(false, "dewEnthalpy: 具体的流体パッケージで実装してください");
+    hv := sat.h_dew;
   end dewEnthalpy;
 
   // =====================================================================
@@ -207,13 +243,11 @@ partial package PartialTwoPhaseMedium
   // =====================================================================
   function voidFraction
     "ボイド率 α を返す（均質平衡モデル、スリップ比 S = 1）"
-    input  ThermodynamicState state "熱力学状態";
+    input  ThermodynamicState state;
     output Real alpha(unit="1", min=0, max=1) "ボイド率";
   protected
-    Real                 x     "乾き度";
-    SaturationProperties sat   "飽和物性";
-    Density              rho_l "飽和液密度 [kg/m³]";
-    Density              rho_v "飽和蒸気密度 [kg/m³]";
+    Real                 x;
+    SaturationProperties sat;
   algorithm
     x := vapourQuality(state);
     if x <= 0.0 then
@@ -221,33 +255,69 @@ partial package PartialTwoPhaseMedium
     elseif x >= 1.0 then
       alpha := 1.0;
     else
-      sat   := setSat_p(pressure(state));
-      rho_l := bubbleDensity(sat);
-      rho_v := dewDensity(sat);
+      sat   := setSat_p(state.p);
       // HEM: α = 1 / (1 + (1-x)/x · ρv/ρl)
-      alpha := 1.0 / (1.0 + (1.0 - x) / x * rho_v / rho_l);
+      alpha := 1.0 / (1.0 + (1.0 - x) / x * sat.d_dew / sat.d_bubble);
     end if;
-    annotation (Documentation(info="<html>
-<p>
-均質平衡モデル (HEM) に基づくボイド率計算。スリップ比 S = 1 を仮定。
-ドリフトフラックスモデルへ拡張する場合は具体的流体パッケージで
-<code>redeclare</code> してスリップ相関を追加する。
-</p>
-</html>"));
   end voidFraction;
+
+  // =====================================================================
+  // Replaceable 関数（具体的流体で実装必須）
+  // =====================================================================
+
+  replaceable function setSat_p
+    "圧力から飽和物性を返す（具体的流体でテーブル補間を実装）"
+    input  AbsolutePressure     p;
+    output SaturationProperties sat;
+  algorithm
+    sat.psat     := p;
+    sat.Tsat     := 0;
+    sat.h_bubble := 0;
+    sat.h_dew    := 0;
+    sat.d_bubble := 0;
+    sat.d_dew    := 0;
+  end setSat_p;
+
+  replaceable function molarMass
+    "モル質量を返す [kg/mol]（具体的流体で定数を返す）"
+    input  ThermodynamicState state;
+    output MolarMass          MM;
+  algorithm
+    MM := 0;
+  end molarMass;
+
+  replaceable function densitySinglePhase
+    "単相密度 [kg/m³]（具体的流体で 2D テーブルを実装）"
+    input  AbsolutePressure p;
+    input  SpecificEnthalpy h;
+    output Density          d;
+  algorithm
+    d := 0;
+  end densitySinglePhase;
+
+  replaceable function temperatureSinglePhase
+    "単相温度 [K]（具体的流体で 2D テーブルを実装）"
+    input  AbsolutePressure p;
+    input  SpecificEnthalpy h;
+    output Temperature      T;
+  algorithm
+    T := 0;
+  end temperatureSinglePhase;
 
   annotation (Documentation(info="<html>
 <p>
-<em>cEAST.TwoPhaseMedia</em> の抽象基底クラス。
-<code>Modelica.Media</code> に依存しない独立したインターフェースを提供する。
+<em>cEAST.TwoPhaseMedia</em> の抽象基底クラス。<code>Modelica.Media</code> 非依存。
 </p>
 <h4>設計方針</h4>
 <ul>
 <li>普遍的な熱力学方程式（<code>u = h - p/d</code>, <code>R_s = R/MM</code>）は
     <code>BaseProperties</code> に一度だけ記述する</li>
-<li>具体的流体パッケージは <code>replaceable</code> 関数を実装するだけでよい
-    （<code>BaseProperties</code> の <code>redeclare</code> 不要）</li>
-<li>独立変数: <code>p</code>（圧力）と <code>h</code>（比エンタルピー）</li>
+<li>二相域の物性計算（密度・温度・乾き度・ボイド率）はこのクラスに実装済み</li>
+<li>具体的流体が実装すべき <code>replaceable</code> 関数:
+    <code>setSat_p</code>, <code>molarMass</code>,
+    <code>densitySinglePhase</code>, <code>temperatureSinglePhase</code></li>
+<li>単相域の実装（<code>densitySinglePhase</code>, <code>temperatureSinglePhase</code>）は
+    2次元物性テーブル生成後に具体的流体パッケージへ追加する</li>
 </ul>
 </html>"));
 end PartialTwoPhaseMedium;
