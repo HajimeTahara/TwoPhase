@@ -4,23 +4,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-**cEAST** — Modelica 言語で書かれた汎用混相流ライブラリ。
+**<project_name>** — Modelica 言語で書かれた汎用混相流ライブラリ。
 
 アーキテクチャは OpenModelica Standard Library (MSL) の Media/Fluid 分担に倣う。
 
 | パッケージ    | 担当範囲                                                         |
 |---------------|------------------------------------------------------------------|
-| `cEAST.Media` | 状態方程式、熱力学・輸送物性、相平衡計算                         |
-| `cEAST.Fluid` | 圧力損失、外部コンポーネントとの熱・仕事交換、流体コンポーネント |
+| `<project_name>.Media` | 状態方程式、熱力学・輸送物性、相平衡計算                         |
+| `<project_name>.Fluid` | 圧力損失、外部コンポーネントとの熱・仕事交換、流体コンポーネント |
 
 ## ディレクトリ構成
 
 ```text
-cEAST/
+<project_name>/
 ├── TwoPhaseMedia/          # Modelica ライブラリ本体
 │   ├── Interfaces/         # 抽象基底クラス群
 │   ├── Common/             # 共通ユーティリティ（将来）
-│   └── LCH/                # 液体メタン (CH4) 実装
+│   ├── LCH/                # 液体メタン (CH4) 実装
+│   ├── TwoPhaseComponent/  # 流体コンポーネント（管・熱交換器等）
+│   └── Examples/           # 使用例
 └── python/                 # CoolProp 物性抽出スクリプト
     ├── coolprop_utils.py   # CoolProp 汎用ラッパー
     ├── methane/            # メタン固有スクリプト
@@ -55,7 +57,7 @@ python methane/export.py
 
 ## パッケージ構成
 
-### cEAST.Media
+### <project_name>.Media
 
 熱物性計算をすべて担う。`Modelica.Media` の構造に倣う。
 
@@ -66,9 +68,9 @@ python methane/export.py
 
 MSL との主な相違点: MSL の `PartialMedium` はコネクタを単相または擬似単相で扱う前提がある。真の混相対応には `ThermodynamicState` レコードに相分率情報を持たせる必要がある。
 
-### cEAST.Fluid
+### <project_name>.Fluid
 
-`cEAST.Media` で定義した流体を使う流動系を担う。`Modelica.Fluid` の構造に倣う。
+`<project_name>.Media` で定義した流体を使う流動系を担う。`Modelica.Fluid` の構造に倣う。
 
 - **Interfaces** — コネクタ定義（圧力・比エンタルピー・質量流量をフェーズ別に持つポート）
 - **圧力損失** — 二相流相関式（Lockhart-Martinelli、Friedel、Chisholm 等）
@@ -140,6 +142,15 @@ MSL の `replaceable function` / `redeclare function extends` パターンは採
 - パス: `docs/claude/YYYY-MM-DD_chat_and_update.md`（当日の日付）
 - 同日に複数セッションがあった場合は同じファイルに追記する
 - 記録すべき内容: 議題・設計方針の決定・変更ファイルと変更理由・未完了事項
+
+## ファイル構成ルール（グランドルール）
+
+Modelica の `model`、`record`、`connector`、`function`、`block` は **1 エンティティ = 1 ファイル** とする。
+
+- ファイル名はエンティティ名と完全一致させる（例: `TestFluidProperties.mo`）
+- `package.mo` にはパッケージ宣言と `annotation` のみを記述し、子エンティティを埋め込まない
+- `package.order` にサブパッケージ・エンティティの順序を記述する
+- 複数のエンティティを `package.mo` にまとめることは禁止
 
 ## 命名規則
 

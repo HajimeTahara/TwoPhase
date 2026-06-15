@@ -1,0 +1,9 @@
+default_permissions = "project-edit"
+
+[permissions.project-edit]
+extends = ":workspace"
+
+[permissions.project-edit.filesystem.":workspace_roots"]
+"TwoPhaseFlow" = "deny"
+"python" = "read"
+"docs/claude" = "read"
