@@ -34,6 +34,7 @@ TwoPhaseFlow/
 
 Thermal/
 ├── package.mo
+├── Material/
 ├── HeatTransfer/
 └── FluidHeatFlow/
 
@@ -62,6 +63,7 @@ docs/
 - `TwoPhaseFlow` は既存の二相流ライブラリとして扱い、Thermal 系の改造作業では変更しません。
 - MSL の `Modelica.Thermal` を参考にしつつ、トップレベルに独立した `Thermal/` パッケージを作成して管理します。
 - Thermal 配下のモデルも 1 model = 1 `.mo` ファイルで管理します。
+- 材料物性は `Thermal.Material` 配下の record として定義し、コンポーネント側は material record をパラメータとして受け取ります。
 - MSL 由来の構成・名前を参考にする場合でも、実装はこのリポジトリの指示と設計方針に合わせて追加します。
 
 ## 媒体設計

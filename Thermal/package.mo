@@ -10,5 +10,11 @@ package Thermal "MSL Thermal を参考にした熱系ライブラリ"
 <p>
 既存の <code>TwoPhaseFlow</code> パッケージとは独立したトップレベルパッケージとして管理します。
 </p>
+<h4>パッケージ構成</h4>
+<ul>
+<li><code>Material</code> — 材料物性レコード</li>
+<li><code>HeatTransfer</code> — 集中定数系の熱伝達コンポーネント</li>
+<li><code>FluidHeatFlow</code> — 簡易流体熱流コンポーネント</li>
+</ul>
 </html>"));
 end Thermal;
