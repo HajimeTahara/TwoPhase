@@ -1,5 +1,5 @@
 within TwoPhaseMedia;
-partial package LCH "液体メタン (CH₄) 媒体パッケージ"
+package LCH "液体メタン (CH₄) 媒体パッケージ"
   extends TwoPhaseMedia.Interfaces.PartialTwoPhaseMedium(
     mediumName  = "Liquid Methane (CH4)",
     singleState = false);
@@ -7,22 +7,22 @@ partial package LCH "液体メタン (CH₄) 媒体パッケージ"
   // =====================================================================
   // 物質定数
   // =====================================================================
-  constant MolarMass        MM_const         = 0.016043 "モル質量 [kg/mol]";
-  constant Temperature      T_critical       = 190.564  "臨界温度 [K]";
-  constant AbsolutePressure p_critical       = 4.5992e6 "臨界圧力 [Pa]";
-  constant Density          d_critical       = 162.66   "臨界密度 [kg/m³]";
-  constant Temperature      T_triple         = 90.694   "三重点温度 [K]";
-  constant AbsolutePressure p_triple         = 11696.0  "三重点圧力 [Pa]";
-  constant Temperature      T_normal_boiling = 111.66   "常圧沸点 [K] (101325 Pa)";
+  redeclare constant MolarMass        MM_const         = 0.016043 "モル質量 [kg/mol]";
+  redeclare constant Temperature      T_critical       = 190.564  "臨界温度 [K]";
+  redeclare constant AbsolutePressure p_critical       = 4.5992e6 "臨界圧力 [Pa]";
+  redeclare constant Density          d_critical       = 162.66   "臨界密度 [kg/m³]";
+  redeclare constant Temperature      T_triple         = 90.694   "三重点温度 [K]";
+  redeclare constant AbsolutePressure p_triple         = 11696.0  "三重点圧力 [Pa]";
+  redeclare constant Temperature      T_normal_boiling = 111.66   "常圧沸点 [K] (101325 Pa)";
 
   // =====================================================================
   // 飽和テーブル（CoolProp/Methane, 100 点, 対数圧力グリッド）
   // 生成スクリプト: python/methane/saturation_table.py
   // p: 1.181e+04 Pa ~ 4.576e+06 Pa
   // =====================================================================
-  constant Integer sat_n = 100;
+  redeclare constant Integer sat_n = 100;
 
-  constant Real sat_p[sat_n](each unit="Pa") =
+  redeclare constant Real sat_p[sat_n](each unit="Pa") =
   {
     11812.96, 12545.894, 13324.304, 14151.009, 15029.008,
     15961.482, 16951.811, 18003.585, 19120.617, 20306.954,
@@ -46,7 +46,7 @@ partial package LCH "液体メタン (CH₄) 媒体パッケージ"
     3596945, 3820117.2, 4057136.2, 4308861, 4576204}
   "飽和圧力グリッド [Pa]";
 
-  constant Real sat_T[sat_n](each unit="K") =
+  redeclare constant Real sat_T[sat_n](each unit="K") =
   {
     90.771428, 91.242557, 91.719006, 92.200869, 92.688238,
     93.181211, 93.679885, 94.18436, 94.694741, 95.211132,
@@ -70,7 +70,7 @@ partial package LCH "液体メタン (CH₄) 媒体パッケージ"
     182.78164, 184.65981, 186.56034, 188.47895, 190.40471}
   "飽和温度 [K]";
 
-  constant Real sat_h_bubble[sat_n](each unit="J/kg") =
+  redeclare constant Real sat_h_bubble[sat_n](each unit="J/kg") =
   {
     -71559.466, -69971.12, -68364, -66737.736, -65091.947,
     -63426.245, -61740.232, -60033.499, -58305.628, -56556.191,
@@ -94,7 +94,7 @@ partial package LCH "液体メタン (CH₄) 媒体パッケージ"
     304130, 317853.37, 333703.58, 353636.83, 391695.6}
   "飽和液比エンタルピー [J/kg]";
 
-  constant Real sat_h_dew[sat_n](each unit="J/kg") =
+  redeclare constant Real sat_h_dew[sat_n](each unit="J/kg") =
   {
     472594.09, 473515.13, 474444.51, 475382.27, 476328.48,
     477283.2, 478246.47, 479218.34, 480198.87, 481188.1,
@@ -118,7 +118,7 @@ partial package LCH "液体メタン (CH₄) 媒体パッケージ"
     523067.93, 514329.58, 502612.12, 485151.64, 442845.56}
   "飽和蒸気比エンタルピー [J/kg]";
 
-  constant Real sat_d_bubble[sat_n](each unit="kg/m3") =
+  redeclare constant Real sat_d_bubble[sat_n](each unit="kg/m3") =
   {
     451.37229, 450.74527, 450.1101, 449.46663, 448.81467,
     448.15403, 447.48454, 446.80598, 446.11816, 445.42087,
@@ -142,7 +142,7 @@ partial package LCH "液体メタン (CH₄) 媒体パッケージ"
     263.53076, 253.38747, 240.95956, 224.04075, 187.03807}
   "飽和液密度 [kg/m³]";
 
-  constant Real sat_d_dew[sat_n](each unit="kg/m3") =
+  redeclare constant Real sat_d_dew[sat_n](each unit="kg/m3") =
   {
     0.25304861, 0.26745506, 0.28267724, 0.29876116, 0.31575546,
     0.33371151, 0.35268359, 0.37272905, 0.39390848, 0.41628594,
@@ -166,42 +166,21 @@ partial package LCH "液体メタン (CH₄) 媒体パッケージ"
     70.831439, 78.797884, 89.025375, 103.70489, 138.58183}
   "飽和蒸気密度 [kg/m³]";
 
-  // =====================================================================
-  // 関数実装（このパッケージが提供するのはここだけ）
-  // =====================================================================
-
-  redeclare function extends molarMass
-    "メタンのモル質量を返す（定数）"
-  algorithm
-    MM := MM_const;
-  end molarMass;
-
-  redeclare function extends setSat_p
-    "飽和テーブルから線形補間で飽和物性を返す"
-  algorithm
-    sat.psat     := p;
-    sat.Tsat     := interpolate1D(sat_p, sat_T,        p);
-    sat.h_bubble := interpolate1D(sat_p, sat_h_bubble, p);
-    sat.h_dew    := interpolate1D(sat_p, sat_h_dew,    p);
-    sat.d_bubble := interpolate1D(sat_p, sat_d_bubble, p);
-    sat.d_dew    := interpolate1D(sat_p, sat_d_dew,    p);
-  end setSat_p;
-
   annotation (Documentation(info="<html>
 <p>
 液体メタン (LCH: Liquid CHane, CH₄) の熱物性パッケージ。
 </p>
 <h4>実装方針</h4>
 <p>
-このパッケージは <b>物質固有のデータ入力のみ</b> を担う。
+このパッケージは <b>物質固有のデータ（定数・テーブル）のみ</b> を提供する。
+計算ロジックはすべて <code>PartialTwoPhaseMedium</code> に実装されている。
 </p>
 <ul>
-<li>二相域の計算ロジック（密度・温度・乾き度・ボイド率）は
+<li>計算ロジック（密度・温度・乾き度・ボイド率・飽和物性補間）は
     <code>PartialTwoPhaseMedium</code> に実装済み</li>
-<li>このパッケージが実装する関数: <code>setSat_p</code>（飽和テーブル補間）,
-    <code>molarMass</code>（定数）のみ</li>
+<li>このパッケージが提供するもの: 物質定数（<code>MM_const</code> 等）と飽和テーブル（<code>sat_p</code> 等）の値のみ</li>
 <li>単相域（<code>densitySinglePhase</code>, <code>temperatureSinglePhase</code>）は
-    <code>python/methane/export.py</code> で 2D テーブルを生成後に追加する</li>
+    <code>python/methane/export.py</code> で 2D テーブルを生成後に <code>PartialTwoPhaseMedium</code> へ追加する</li>
 </ul>
 <h4>物質定数</h4>
 <ul>
