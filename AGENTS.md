@@ -18,25 +18,17 @@
 ## リポジトリ構成
 
 ```text
-TwoPhaseFlow/
-├── package.mo
-├── Media/
-│   ├── Interfaces/
-│   ├── Common/
-│   └── LCH/
-├── Component/
-│   ├── Interfaces/
-│   ├── Pipes/
-│   ├── Sources/
-│   ├── Tanks/
-│   └── Valves/
-└── Examples/
-
-Thermal/
-├── package.mo
-├── Material/
-├── HeatTransfer/
-└── FluidHeatFlow/
+modelica/
+└── EAST/
+    ├── package.mo
+    ├── TwoPhaseFlow/
+    │   ├── Media/
+    │   ├── Component/
+    │   └── Examples/
+    └── Thermal/
+        ├── Material/
+        ├── HeatTransfer/
+        └── FluidHeatFlow/
 
 python/
 ├── coolprop_utils.py
@@ -60,17 +52,17 @@ docs/
 
 ## Thermal パッケージ方針
 
-- `TwoPhaseFlow` は既存の二相流ライブラリとして扱い、Thermal 系の改造作業では変更しません。
-- MSL の `Modelica.Thermal` を参考にしつつ、トップレベルに独立した `Thermal/` パッケージを作成して管理します。
+- `EAST.TwoPhaseFlow` は既存の二相流ライブラリとして扱い、Thermal 系の改造作業では原則として変更しません。
+- MSL の `Modelica.Thermal` を参考にしつつ、`EAST.Thermal` パッケージとして管理します。
 - Thermal 配下のモデルも 1 model = 1 `.mo` ファイルで管理します。
-- 材料物性は `Thermal.Material` 配下の record として定義し、コンポーネント側は material record をパラメータとして受け取ります。
+- 材料物性は `EAST.Thermal.Material` 配下の record として定義し、コンポーネント側は material record をパラメータとして受け取ります。
 - MSL 由来の構成・名前を参考にする場合でも、実装はこのリポジトリの指示と設計方針に合わせて追加します。
 
 ## 媒体設計
 
-`TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium` が計算ロジックを持ちます。
+`EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium` が計算ロジックを持ちます。
 
-`TwoPhaseFlow.Media.LCH` などの具体的媒体パッケージは、物質定数と物性テーブル値だけを提供します。アーキテクチャを意図的に変更する場合を除き、具体的媒体パッケージに `algorithm` セクションを追加しないでください。
+`EAST.TwoPhaseFlow.Media.LCH` などの具体的媒体パッケージは、物質定数と物性テーブル値だけを提供します。アーキテクチャを意図的に変更する場合を除き、具体的媒体パッケージに `algorithm` セクションを追加しないでください。
 
 新しい物性テーブルを追加する場合は、以下の分担に従います。
 

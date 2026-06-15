@@ -25,3 +25,22 @@
 #### 未確認事項
 
 - この環境では `omc` が見つからないため、OpenModelica でのコンパイル確認は未実施。
+
+---
+
+## 追記: EAST 統合パッケージ移動後の within 修正
+
+### 背景
+
+ユーザーが `Thermal` と `TwoPhaseFlow` を `modelica/EAST/` 配下へ移動し、統合トップレベルパッケージ `EAST` として管理する構成に変更した。
+移動自体はファイル操作のみだったため、各 `.mo` ファイルの `within` 句と絶対参照を新しいパッケージ階層に合わせて修正した。
+
+### 変更内容
+
+- `modelica/EAST/package.mo` にトップレベルパッケージ `EAST` を定義。
+- `modelica/EAST/package.order` に `TwoPhaseFlow` と `Thermal` を追加。
+- `modelica/EAST/TwoPhaseFlow/**` の `within` 句を `EAST.TwoPhaseFlow...` 階層へ修正。
+- `modelica/EAST/Thermal/**` の `within` 句を `EAST.Thermal...` 階層へ修正。
+- コード内の絶対参照 `TwoPhaseFlow.*` / `Thermal.*` を `EAST.TwoPhaseFlow.*` / `EAST.Thermal.*` に修正。
+- `modelica/EAST/TwoPhaseFlow/package.order` を現構成の `Media`、`Component`、`Examples` に修正。
+- `AGENTS.md` のリポジトリ構成と Thermal / 媒体設計方針の参照名を `EAST` 階層に更新。
