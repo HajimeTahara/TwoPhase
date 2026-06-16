@@ -59,13 +59,16 @@ def get_triple_point(fluid: str) -> dict[str, float]:
     }
 
 
-def get_fluid_constants(fluid: str) -> dict[str, float]:
+def get_fluid_constants(fluid: str, p_ref: float = 101325.0) -> dict[str, float]:
     """
     Modelica 側の PartialTwoPhaseMedium が要求する抽象定数を一括取得する。
 
     Peng-Robinson EOS（densitySinglePhase）が必要とする
-    T_critical, p_critical, MM, omega を含む。
+    T_critical, p_critical, MM, omega に加え、
+    specificEnthalpy_pT の定積比熱近似に使う cp_liquid/cp_vapor を
+    基準圧力 p_ref [Pa] での飽和比熱として取得する。
     """
+    sat_ref = get_saturation_properties_at_p(fluid, p_ref)
     return {
         "MM":               PropsSI("M", fluid),
         "T_critical":       PropsSI("Tcrit", fluid),
@@ -75,6 +78,8 @@ def get_fluid_constants(fluid: str) -> dict[str, float]:
         "p_triple":         PropsSI("ptriple", fluid),
         "T_normal_boiling": PropsSI("T", "P", 101325.0, "Q", 0, fluid),
         "omega":            PropsSI("acentric", fluid),
+        "cp_liquid":        sat_ref["cp_l"],
+        "cp_vapor":         sat_ref["cp_v"],
     }
 
 

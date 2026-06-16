@@ -18,6 +18,8 @@ partial package PartialTwoPhaseMedium
   replaceable constant AbsolutePressure p_triple                    "三重点圧力 [Pa]";
   replaceable constant Temperature      T_normal_boiling             "常圧沸点 [K] (101325 Pa)";
   replaceable constant Real             omega_const                  "離心因子 (Pitzer acentric factor, PR EOS 用)";
+  replaceable constant SpecificHeatCapacity cp_liquid_const            "飽和液の代表定圧比熱 [J/(kg·K)]（specificEnthalpy_pT 近似用）";
+  replaceable constant SpecificHeatCapacity cp_vapor_const             "飽和蒸気の代表定圧比熱 [J/(kg·K)]（specificEnthalpy_pT 近似用）";
 
   replaceable constant Integer   sat_n                                   "飽和テーブル点数";
   replaceable constant Real      sat_p[sat_n]        (each unit="Pa")    "飽和圧力グリッド [Pa]";
@@ -391,6 +393,22 @@ partial package PartialTwoPhaseMedium
     T   := sat.Tsat;
   end temperatureSinglePhase;
 
+  function specificEnthalpy_pT
+    "比エンタルピー [J/kg] を p, T から計算する（T 指定境界条件用; 定積比熱近似）"
+    input  AbsolutePressure p;
+    input  Temperature      T;
+    output SpecificEnthalpy h;
+  protected
+    SaturationProperties sat;
+  algorithm
+    sat := setSat_p(p);
+    if T <= sat.Tsat then
+      h := sat.h_bubble + cp_liquid_const * (T - sat.Tsat);  // 過冷却液（近似）
+    else
+      h := sat.h_dew    + cp_vapor_const  * (T - sat.Tsat);  // 過熱蒸気（近似）
+    end if;
+  end specificEnthalpy_pT;
+
   annotation (Documentation(info="<html>
 <p>
 <em>cEAST.TwoPhaseMedia</em> の抽象基底クラス。<code>Modelica.Media</code> 非依存。
@@ -403,7 +421,8 @@ partial package PartialTwoPhaseMedium
 <li>具体的流体が提供すべき抽象定数:
     <code>MM_const</code>, <code>sat_n</code>, <code>sat_p</code>, <code>sat_T</code>,
     <code>sat_h_bubble</code>, <code>sat_h_dew</code>, <code>sat_d_bubble</code>, <code>sat_d_dew</code>,
-    <code>T_critical</code>, <code>p_critical</code>, <code>omega_const</code></li>
+    <code>T_critical</code>, <code>p_critical</code>, <code>omega_const</code>,
+    <code>cp_liquid_const</code>, <code>cp_vapor_const</code></li>
 <li>単相域の密度（<code>densitySinglePhase</code>）は表引きではなく
     Peng-Robinson (PR) 状態方程式で計算する（後述）</li>
 </ul>
@@ -476,5 +495,25 @@ Z³ - (1-B)·Z² + (A - 3B² - 2B)·Z - (AB - B² - B³) = 0
     未着手であり、過冷却・過熱状態での温度・密度精度は限定的。</li>
 <li>NASA 多項式・Péneloux 補正は現段階では実装しない（PR EOS のみの単相密度実装にとどめる方針）。</li>
 </ul>
+
+<h4>T 指定境界条件: specificEnthalpy_pT（定積比熱近似）</h4>
+<p>
+<code>specificEnthalpy_pT(p, T)</code> は、<code>Boundary_pT</code> / <code>MassFlowSource_T</code>
+など温度で境界条件を与えるモデルのために、(p, T) から比エンタルピー h を計算する。
+</p>
+<pre>
+T &le; Tsat(p):  h = h_bubble(p) + cp_liquid_const &middot; (T - Tsat(p))   過冷却液
+T &gt;  Tsat(p):  h = h_dew(p)    + cp_vapor_const  &middot; (T - Tsat(p))   過熱蒸気
+</pre>
+<p>
+<b>これは比熱を一定とみなした粗い近似であり、正確な熱力学関係式ではない。</b>
+正確な h(p,T) には理想気体エンタルピー項（NASA 多項式）+ PR EOS 離脱関数が必要だが、
+現段階ではこの構成要素を実装していないため、飽和点からの線形外挿で代用している。
+飽和点に近い条件（小さな過冷却度・過熱度）では妥当だが、飽和点から離れるほど誤差が増大する。
+</p>
+<p>
+<code>cp_liquid_const</code>, <code>cp_vapor_const</code> は具体的流体が提供する代表比熱
+[J/(kg·K)]（CoolProp から代表圧力での飽和比熱を取得して設定する想定）。
+</p>
 </html>"));
 end PartialTwoPhaseMedium;

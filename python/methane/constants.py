@@ -30,6 +30,8 @@ ENTRIES: list[tuple[str, str, str, str]] = [
     ("p_triple",         "AbsolutePressure", "p_triple",         "三重点圧力 [Pa]"),
     ("T_normal_boiling", "Temperature",     "T_normal_boiling", "常圧沸点 [K] (101325 Pa)"),
     ("omega_const",      "Real",            "omega",            "離心因子 (CoolProp acentric, PR EOS 用)"),
+    ("cp_liquid_const",  "SpecificHeatCapacity", "cp_liquid",    "飽和液の代表定圧比熱 [J/(kg·K)] (101325 Pa, specificEnthalpy_pT 用)"),
+    ("cp_vapor_const",   "SpecificHeatCapacity", "cp_vapor",     "飽和蒸気の代表定圧比熱 [J/(kg·K)] (101325 Pa, specificEnthalpy_pT 用)"),
 ]
 
 

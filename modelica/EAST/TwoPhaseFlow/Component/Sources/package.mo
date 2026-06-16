@@ -10,7 +10,14 @@ MSL の <code>Modelica.Fluid.Sources</code> に相当する。
 <ul>
 <li><code>MassFlowSource_h</code> — 質量流量・比エンタルピー固定（圧力は系が決定）</li>
 <li><code>Boundary_ph</code>      — 圧力・比エンタルピー固定（質量流量は系が決定）</li>
+<li><code>MassFlowSource_T</code> — 質量流量・温度固定（圧力は系が決定）</li>
+<li><code>Boundary_pT</code>      — 圧力・温度固定（質量流量は系が決定）</li>
 </ul>
+<p>
+<code>_T</code> 系のモデルは <code>Medium.specificEnthalpy_pT</code>（飽和点からの
+定積比熱近似）で温度を比エンタルピーに変換する。飽和点から離れた条件では
+精度が低い点に注意（詳細は <code>PartialTwoPhaseMedium</code> のドキュメンテーション参照）。
+</p>
 <h4>接続規則</h4>
 <p>
 両モデルとも <code>FluidPort_b</code> 型の <code>port</code> を持つ。

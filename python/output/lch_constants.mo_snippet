@@ -1,9 +1,11 @@
   // --- 流体定数（CoolProp/Methane）---
-  redeclare constant MolarMass        MM_const         = 0.0160428 "モル質量 [kg/mol]";
-  redeclare constant Temperature      T_critical       = 190.564 "臨界温度 [K]";
-  redeclare constant AbsolutePressure p_critical       = 4.5992e+06 "臨界圧力 [Pa]";
-  redeclare constant Density          d_critical       = 162.66 "臨界密度 [kg/m³]";
-  redeclare constant Temperature      T_triple         = 90.6941 "三重点温度 [K]";
-  redeclare constant AbsolutePressure p_triple         = 11696.1 "三重点圧力 [Pa]";
-  redeclare constant Temperature      T_normal_boiling = 111.667 "常圧沸点 [K] (101325 Pa)";
-  redeclare constant Real             omega_const      = 0.01142 "離心因子 (CoolProp acentric, PR EOS 用)";
+  redeclare constant MolarMass            MM_const         = 0.0160428 "モル質量 [kg/mol]";
+  redeclare constant Temperature          T_critical       = 190.564 "臨界温度 [K]";
+  redeclare constant AbsolutePressure     p_critical       = 4.5992e+06 "臨界圧力 [Pa]";
+  redeclare constant Density              d_critical       = 162.66 "臨界密度 [kg/m³]";
+  redeclare constant Temperature          T_triple         = 90.6941 "三重点温度 [K]";
+  redeclare constant AbsolutePressure     p_triple         = 11696.1 "三重点圧力 [Pa]";
+  redeclare constant Temperature          T_normal_boiling = 111.667 "常圧沸点 [K] (101325 Pa)";
+  redeclare constant Real                 omega_const      = 0.01142 "離心因子 (CoolProp acentric, PR EOS 用)";
+  redeclare constant SpecificHeatCapacity cp_liquid_const  = 3481.08 "飽和液の代表定圧比熱 [J/(kg·K)] (101325 Pa, specificEnthalpy_pT 用)";
+  redeclare constant SpecificHeatCapacity cp_vapor_const   = 2217.68 "飽和蒸気の代表定圧比熱 [J/(kg·K)] (101325 Pa, specificEnthalpy_pT 用)";

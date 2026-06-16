@@ -15,6 +15,8 @@ package LCH "液体メタン (CH₄) 媒体パッケージ"
   redeclare constant AbsolutePressure p_triple         = 11696.0  "三重点圧力 [Pa]";
   redeclare constant Temperature      T_normal_boiling = 111.66   "常圧沸点 [K] (101325 Pa)";
   redeclare constant Real             omega_const      = 0.01142  "離心因子 (NIST WebBook)";
+  redeclare constant SpecificHeatCapacity cp_liquid_const = 3481.08 "飽和液の代表定圧比熱 [J/(kg·K)] (101325 Pa, CoolProp)";
+  redeclare constant SpecificHeatCapacity cp_vapor_const  = 2217.68 "飽和蒸気の代表定圧比熱 [J/(kg·K)] (101325 Pa, CoolProp)";
 
   // =====================================================================
   // 飽和テーブル（CoolProp/Methane, 100 点, 対数圧力グリッド）
