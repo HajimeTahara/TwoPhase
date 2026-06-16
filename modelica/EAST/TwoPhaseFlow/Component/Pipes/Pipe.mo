@@ -17,9 +17,11 @@ model Pipe
 
   // ポート
   EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_a port_a(redeclare package Medium = Medium)
-    "上流ポート（入口）";
+    "上流ポート（入口）"
+    annotation (Placement(transformation(extent={{-110,-10},{-90,10}})));
   EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_b port_b(redeclare package Medium = Medium)
-    "下流ポート（出口）";
+    "下流ポート（出口）"
+    annotation (Placement(transformation(extent={{90,-10},{110,10}})));
 
   // 流量・エンタルピー
   Modelica.Units.SI.MassFlowRate     m_flow "質量流量 [kg/s]（a→b 方向正）";

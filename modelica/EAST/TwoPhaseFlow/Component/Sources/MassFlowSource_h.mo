@@ -11,7 +11,8 @@ model MassFlowSource_h
     "流出流体の比エンタルピー [J/kg]";
 
   EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_b port(redeclare package Medium = Medium)
-    "出口ポート（下流コンポーネントへ接続）";
+    "出口ポート（下流コンポーネントへ接続）"
+    annotation (Placement(transformation(extent={{90,-10},{110,10}})));
 
 equation
   port.m_flow     = -m_flow_set;  // 流入正規約: 源泉から流出なので負
