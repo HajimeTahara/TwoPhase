@@ -47,7 +47,7 @@ def get_critical_point(fluid: str) -> dict[str, float]:
     return {
         "T_crit":   T_c,
         "p_crit":   p_c,
-        "rho_crit": PropsSI("Rhomass_critical", fluid),
+        "rho_crit": PropsSI("rhomass_critical", fluid),
     }
 
 
@@ -56,6 +56,25 @@ def get_triple_point(fluid: str) -> dict[str, float]:
     return {
         "T_triple": PropsSI("Ttriple", fluid),
         "p_triple": PropsSI("ptriple", fluid),
+    }
+
+
+def get_fluid_constants(fluid: str) -> dict[str, float]:
+    """
+    Modelica 側の PartialTwoPhaseMedium が要求する抽象定数を一括取得する。
+
+    Peng-Robinson EOS（densitySinglePhase）が必要とする
+    T_critical, p_critical, MM, omega を含む。
+    """
+    return {
+        "MM":               PropsSI("M", fluid),
+        "T_critical":       PropsSI("Tcrit", fluid),
+        "p_critical":       PropsSI("Pcrit", fluid),
+        "d_critical":       PropsSI("rhomass_critical", fluid),
+        "T_triple":         PropsSI("Ttriple", fluid),
+        "p_triple":         PropsSI("ptriple", fluid),
+        "T_normal_boiling": PropsSI("T", "P", 101325.0, "Q", 0, fluid),
+        "omega":            PropsSI("acentric", fluid),
     }
 
 

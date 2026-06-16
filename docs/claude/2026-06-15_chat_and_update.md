@@ -335,3 +335,166 @@ MSL の `Modelica.Fluid` に倣って `FluidPort` を `replaceable package Mediu
 
 - Codex などの coding agent 向け作業指針を英語から日本語へ変換
 - 内容構成は維持し、プロジェクト概要・設計ルール・媒体設計・物性生成パイプライン・セッション記録ルールを日本語で記述
+
+---
+
+## 追記（2026-06-16）: Icon View へのポート配置と Thermal 担当除外ルール
+
+### 1. Icon View ポート配置の修正
+
+**背景:** `Pipe`、`MassFlowSource_h`、`Boundary_ph` の Icon View にポートが表示されていなかった。
+Modelica の GUI ツールはポート変数宣言に `Placement` アノテーションがないとアイコン上にポートを描画しない。
+
+**変更ファイル:**
+
+- `modelica/EAST/TwoPhaseFlow/Component/Pipes/Pipe.mo`
+  - `port_a`（FluidPort_a）: 左端 `extent={{-110,-10},{-90,10}}` に Placement 追加
+  - `port_b`（FluidPort_b）: 右端 `extent={{90,-10},{110,10}}` に Placement 追加
+
+- `modelica/EAST/TwoPhaseFlow/Component/Sources/MassFlowSource_h.mo`
+  - `port`（FluidPort_b）: 右端 `extent={{90,-10},{110,10}}` に Placement 追加
+
+- `modelica/EAST/TwoPhaseFlow/Component/Sources/Boundary_ph.mo`
+  - `port`（FluidPort_b）: 右端 `extent={{90,-10},{110,10}}` に Placement 追加
+
+### 2. Thermal パッケージの担当除外ルール（CLAUDE.md 追記）
+
+**内容:** `modelica/EAST/Thermal/` は別チームが担当するため、Claude Code は読み書き禁止。
+`CLAUDE.md` の「担当範囲の制限」セクションとしてグランドルールに追記。
+
+---
+
+## 追記（2026-06-16）: TestPipeWithSource を Diagram View で操作可能に
+
+### 変更内容
+
+`modelica/EAST/TwoPhaseFlow/Examples/TestPipeWithSource.mo`
+
+**背景:** コンポーネントインスタンスに `Placement` アノテーションがないため Diagram View に表示されず、GUI からパラメータを設定できなかった。
+
+**変更 1: コンポーネントへの Placement 追加**
+
+| コンポーネント | extent | 備考 |
+| --- | --- | --- |
+| `source` (MassFlowSource_h) | `{{-90,-15},{-60,15}}` | 左側、中心 (-75, 0) |
+| `pipe` (Pipe) | `{{-30,-15},{30,15}}` | 中央、中心 (0, 0) |
+| `sink` (Boundary_ph) | `{{90,-15},{60,15}}` | 右側、水平ミラー配置 |
+
+`sink` を x1 > x2 の extent（水平ミラー）にすることで、`port`（FluidPort_b）が視覚的に左側に向き、`pipe.port_b` と正面で接続されるレイアウトにした。
+
+**変更 2: connect に Line アノテーション追加**
+
+- `source.port → pipe.port_a`: `points={{-60,0},{-30,0}}`, blue, thickness=0.5
+- `pipe.port_b → sink.port`: `points={{30,0},{60,0}}`, blue, thickness=0.5
+
+---
+
+## 追記（2026-06-16）: densitySinglePhase / temperatureSinglePhase の 0 除算バグ修正
+
+### 現象
+
+`TestPipeWithSource` 実行時に初期化で 0 除算エラー。
+
+```
+division by zero at time 0, (a=500000) / (b=0), where divisor b expression is: pipe.props_a.d
+```
+
+### 原因
+
+入口条件 (p=5 bar, h=30 kJ/kg) は飽和液比エンタルピー (≈51.8 kJ/kg) より低く、過冷却液（単相）。
+`density()` は単相時に `densitySinglePhase(p, h)` を呼ぶが、スタブ実装が `d := 0` を返していた。
+`BaseProperties` の `u = h - p / d` で p/0 が発生。
+
+### 修正
+
+`modelica/EAST/TwoPhaseFlow/Media/Interfaces/PartialTwoPhaseMedium.mo`
+
+`densitySinglePhase` と `temperatureSinglePhase` を、飽和テーブルを使う暫定実装に変更：
+
+- `densitySinglePhase`: `h < h_bubble` → `sat.d_bubble`（飽和液密度）、それ以外 → `sat.d_dew`（飽和蒸気密度）
+- `temperatureSinglePhase`: `sat.Tsat`（飽和温度）を返す
+
+どちらも `setSat_p(p)` を内部で呼ぶ。値は近似だが非ゼロであり、2D テーブル実装前の暫定として機能する。
+
+---
+
+## 追記（2026-06-16）: PR EOS による densitySinglePhase 実装
+
+### 方針決定
+
+- 単相物性の計算方法として **Peng-Robinson (PR) EOS + NASA 多項式** の方針を採用
+- 2D テーブル引きは流体ごとに生成が必要で汎用性が低いため極力使わない
+- 段階的に実装: まず PR 密度 → 次に T(p,h) Newton 反復 → 将来 Péneloux 体積補正
+
+### 今回の実装
+
+**`PartialTwoPhaseMedium.mo`**
+
+1. 抽象定数 `omega_const`（離心因子）を追加
+2. 関数 `prSolveZ(A, B, liquid)` を追加
+   - PR 3次方程式 `Z³-(1-B)Z²+(A-3B²-2B)Z-(AB-B²-B³)=0` の実数根を求める
+   - 判別式 D ≥ 0: Cardano 公式（実根1つ）
+   - 判別式 D < 0: 三角関数法 `t = m·cos(φ)`（実根3つ）、液相/気相フラグで最小/最大根を選択
+3. 関数 `prDensity(p, T, liquid)` を追加: κ → α(T) → a, b → A, B → Z → d
+4. `densitySinglePhase(p, h)` を `prDensity(p, sat.Tsat, h < h_bubble)` で実装
+
+**`LCH/package.mo`**
+
+- `omega_const = 0.01142` を追加（NIST WebBook 値）
+
+### 現状の制限
+
+`densitySinglePhase` は T = T_sat（飽和温度）を暫定で使用しているため、実際の T(p,h) を使った値ではない。
+PR の機械は完成しているが、T(p,h) Newton 反復を実装するまでは精度面での改善は限定的。
+精度改善の順序: ① T(p,h) Newton 反復 → ② NASA 多項式 cp°(T) → ③ Péneloux 体積補正
+
+### 未完了（次のステップ）
+
+- `temperatureSinglePhase`: 現在は sat.Tsat を返す暫定実装
+- T(p,h) 反復に必要な h(p, T) 計算: 理想気体項（NASA 7係数多項式）+ PR 離脱関数
+
+---
+
+## 追記（2026-06-16）: CoolProp 物質定数抽出 + PR-EOS ドキュメント整備
+
+### 方針確認
+
+ユーザー指示: 「現段階では単相の密度算出は PR-EOS のみの実装にとどめる。PR-EOS の特徴・物理式・
+流体ごとに必要な変数は `PartialTwoPhaseMedium` のドキュメンテーションに記載する」。
+NASA 多項式・Péneloux 補正は依然未着手のまま（既定方針通り）。
+
+### 変更ファイル
+
+**`python/coolprop_utils.py`**
+
+- `get_fluid_constants(fluid)` を追加: PR EOS が必要とする `T_critical`, `p_critical`, `MM`, `omega`
+  に加え `d_critical`, `T_triple`, `p_triple`, `T_normal_boiling` を一括取得する
+- **既存バグ修正**: `get_critical_point` 内の `PropsSI("Rhomass_critical", fluid)` が
+  大文字小文字の違いで `ValueError` になっていた（CoolProp の正しいキーは小文字 `rhomass_critical`）。
+  動作確認のため実行して発覚、`get_fluid_constants` 側も含めて修正。
+
+**`python/methane/constants.py`**（新規）
+
+- `get_fluid_constants("Methane")` の結果から `LCH/package.mo` 用の `redeclare constant` スニペットを
+  生成して `python/output/lch_constants.mo_snippet` に出力するスクリプト
+- 実行して動作確認済み（`py methane/constants.py`）。既存の手入力値（`omega_const = 0.01142` 等）は
+  CoolProp 取得値と一致することを確認（クロスチェック完了）
+- Windows コンソール（cp932）での `kg/m³` 等の出力に備え `sys.stdout.reconfigure(encoding="utf-8")` を追加
+
+**`modelica/EAST/TwoPhaseFlow/Media/Interfaces/PartialTwoPhaseMedium.mo`**
+
+- `Documentation` ブロックに「単相密度モデル: Peng-Robinson (PR) 状態方程式」セクションを追加
+  - 状態方程式・a(T)/b/α(T)/κ の式、PR 普遍定数（流体非依存）と流体固有定数（Tc, pc, ω, MM）の区別
+  - 圧縮因子 Z の3次方程式と根の選択方法（Cardano / 三角関数法）
+  - 精度の既知の限界（液相密度誤差 10～30%、T は暫定的に T_sat を使用している点）を明記
+  - 古くなっていた「2次元物性テーブル生成後に追加する」という記述を削除し、PR EOS 実装済みである旨に更新
+
+**`modelica/EAST/TwoPhaseFlow/Media/LCH/package.mo`**
+
+- 同様に、ドキュメント内の「2D テーブル生成後に追加する」という記述を PR EOS 方式に合わせて更新
+
+### 未完了（次のステップ）
+
+- `temperatureSinglePhase` の T(p,h) Newton 反復実装（NASA 多項式 + PR 離脱関数が前提）
+- Péneloux 体積補正（液相密度精度改善）
+- 実装は引き続き「ひとつずつ変更を追う」方針で進める

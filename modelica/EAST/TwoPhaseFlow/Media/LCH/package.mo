@@ -14,6 +14,7 @@ package LCH "液体メタン (CH₄) 媒体パッケージ"
   redeclare constant Temperature      T_triple         = 90.694   "三重点温度 [K]";
   redeclare constant AbsolutePressure p_triple         = 11696.0  "三重点圧力 [Pa]";
   redeclare constant Temperature      T_normal_boiling = 111.66   "常圧沸点 [K] (101325 Pa)";
+  redeclare constant Real             omega_const      = 0.01142  "離心因子 (NIST WebBook)";
 
   // =====================================================================
   // 飽和テーブル（CoolProp/Methane, 100 点, 対数圧力グリッド）
@@ -179,8 +180,9 @@ package LCH "液体メタン (CH₄) 媒体パッケージ"
 <li>計算ロジック（密度・温度・乾き度・ボイド率・飽和物性補間）は
     <code>PartialTwoPhaseMedium</code> に実装済み</li>
 <li>このパッケージが提供するもの: 物質定数（<code>MM_const</code> 等）と飽和テーブル（<code>sat_p</code> 等）の値のみ</li>
-<li>単相域（<code>densitySinglePhase</code>, <code>temperatureSinglePhase</code>）は
-    <code>python/methane/export.py</code> で 2D テーブルを生成後に <code>PartialTwoPhaseMedium</code> へ追加する</li>
+<li>単相域の密度（<code>densitySinglePhase</code>）は表引きではなく Peng-Robinson 状態方程式で計算する
+    （<code>PartialTwoPhaseMedium</code> に実装済み）。このパッケージが追加で提供するのは
+    <code>T_critical</code>, <code>p_critical</code>, <code>omega_const</code>, <code>MM_const</code> の値のみ</li>
 </ul>
 <h4>物質定数</h4>
 <ul>

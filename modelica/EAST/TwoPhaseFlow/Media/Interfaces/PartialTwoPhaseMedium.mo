@@ -17,7 +17,8 @@ partial package PartialTwoPhaseMedium
   replaceable constant Temperature      T_triple                    "三重点温度 [K]";
   replaceable constant AbsolutePressure p_triple                    "三重点圧力 [Pa]";
   replaceable constant Temperature      T_normal_boiling             "常圧沸点 [K] (101325 Pa)";
-  
+  replaceable constant Real             omega_const                  "離心因子 (Pitzer acentric factor, PR EOS 用)";
+
   replaceable constant Integer   sat_n                                   "飽和テーブル点数";
   replaceable constant Real      sat_p[sat_n]        (each unit="Pa")    "飽和圧力グリッド [Pa]";
   replaceable constant Real      sat_T[sat_n]        (each unit="K")     "飽和温度 [K]";
@@ -306,25 +307,88 @@ partial package PartialTwoPhaseMedium
   end molarMass;
 
   // =====================================================================
-  // 単相物性スタブ（2D テーブル追加後にこのクラスへ実装）
+  // 単相物性（Peng-Robinson 状態方程式）
   // =====================================================================
 
+  function prSolveZ
+    "PR 3次方程式 Z³-(1-B)Z²+(A-3B²-2B)Z-(AB-B²-B³)=0 の圧縮因子を返す"
+    input  Real    A      "PR 無次元パラメータ A = a(T)·p/(R·T)²";
+    input  Real    B      "PR 無次元パラメータ B = b·p/(R·T)";
+    input  Boolean liquid "true: 液相根（最小根）、false: 気相根（最大根）";
+    output Real    Z      "圧縮因子";
+  protected
+    Real c2, c1, c0, p_, q_, D, m, alpha;
+    Real u, v_, Z1, Z2, Z3;
+  algorithm
+    // PR 3次を標準形 Z³ + c2·Z² + c1·Z + c0 = 0 に整理
+    c2 := -(1.0 - B);
+    c1 :=  A - 3.0*B^2 - 2.0*B;
+    c0 := -(A*B - B^2 - B^3);
+    // 変数変換 Z = t - c2/3（2次項を消した抑圧3次: t³ + p_·t + q_ = 0）
+    p_ := c1 - c2^2/3.0;
+    q_ := c0 - c1*c2/3.0 + 2.0*c2^3/27.0;
+    D  := (p_/3.0)^3 + (q_/2.0)^2;
+    if D >= 0.0 then
+      // 実根1つ（Cardano 公式）
+      u  := -q_/2.0 + sqrt(D);
+      v_ := -q_/2.0 - sqrt(D);
+      Z  := (if u >= 0.0 then u^(1.0/3.0) else -((-u)^(1.0/3.0)))
+          + (if v_ >= 0.0 then v_^(1.0/3.0) else -((-v_)^(1.0/3.0)))
+          - c2/3.0;
+    else
+      // 実根3つ（三角関数法: t = m·cos(φ)）
+      m     := 2.0*sqrt(-p_/3.0);
+      alpha := Modelica.Math.acos(max(-1.0, min(1.0, -4.0*q_/m^3)));
+      Z1    := m*Modelica.Math.cos(alpha/3.0)                                     - c2/3.0;
+      Z2    := m*Modelica.Math.cos(alpha/3.0 + 2.0*Modelica.Constants.pi/3.0)    - c2/3.0;
+      Z3    := m*Modelica.Math.cos(alpha/3.0 + 4.0*Modelica.Constants.pi/3.0)    - c2/3.0;
+      Z     := if liquid then min(Z1, min(Z2, Z3)) else max(Z1, max(Z2, Z3));
+    end if;
+    Z := max(Z, 1.0e-10);  // 非物理的な負値・ゼロを排除
+  end prSolveZ;
+
+  function prDensity
+    "Peng-Robinson 状態方程式による密度 [kg/m³]（単相; p と T が必要）"
+    input  AbsolutePressure p;
+    input  Temperature      T;
+    input  Boolean          liquid "true: 液相根、false: 気相根";
+    output Density          d;
+  protected
+    Real kappa, Tr, alpha_pr, a, b, A, B, Z;
+  algorithm
+    kappa    := 0.37464 + 1.54226*omega_const - 0.26992*omega_const^2;
+    Tr       := T / T_critical;
+    alpha_pr := (1.0 + kappa*(1.0 - sqrt(Tr)))^2;
+    a := 0.45724 * Modelica.Constants.R^2 * T_critical^2 / p_critical * alpha_pr;
+    b := 0.07780 * Modelica.Constants.R   * T_critical   / p_critical;
+    A := a * p / (Modelica.Constants.R * T)^2;
+    B := b * p / (Modelica.Constants.R * T);
+    Z := prSolveZ(A, B, liquid);
+    d := MM_const * p / (Z * Modelica.Constants.R * T);
+  end prDensity;
+
   function densitySinglePhase
-    "単相密度 [kg/m³]（2D テーブル実装待ち）"
+    "単相密度 [kg/m³]（PR EOS; T は飽和温度で近似。T(p,h) 実装後に精度向上）"
     input  AbsolutePressure p;
     input  SpecificEnthalpy h;
     output Density          d;
+  protected
+    SaturationProperties sat;
   algorithm
-    d := 0;
+    sat := setSat_p(p);
+    d   := prDensity(p, sat.Tsat, h < sat.h_bubble);
   end densitySinglePhase;
 
   function temperatureSinglePhase
-    "単相温度 [K]（2D テーブル実装待ち）"
+    "単相温度 [K]（暫定: 飽和温度を返す。NASA 多項式 + PR 実装待ち）"
     input  AbsolutePressure p;
     input  SpecificEnthalpy h;
     output Temperature      T;
+  protected
+    SaturationProperties sat;
   algorithm
-    T := 0;
+    sat := setSat_p(p);
+    T   := sat.Tsat;
   end temperatureSinglePhase;
 
   annotation (Documentation(info="<html>
@@ -338,9 +402,79 @@ partial package PartialTwoPhaseMedium
 <li>二相域の物性計算（密度・温度・乾き度・ボイド率）はこのクラスに実装済み</li>
 <li>具体的流体が提供すべき抽象定数:
     <code>MM_const</code>, <code>sat_n</code>, <code>sat_p</code>, <code>sat_T</code>,
-    <code>sat_h_bubble</code>, <code>sat_h_dew</code>, <code>sat_d_bubble</code>, <code>sat_d_dew</code></li>
-<li>単相域の実装（<code>densitySinglePhase</code>, <code>temperatureSinglePhase</code>）は
-    2次元物性テーブル生成後にこのクラスへ追加する</li>
+    <code>sat_h_bubble</code>, <code>sat_h_dew</code>, <code>sat_d_bubble</code>, <code>sat_d_dew</code>,
+    <code>T_critical</code>, <code>p_critical</code>, <code>omega_const</code></li>
+<li>単相域の密度（<code>densitySinglePhase</code>）は表引きではなく
+    Peng-Robinson (PR) 状態方程式で計算する（後述）</li>
+</ul>
+
+<h4>単相密度モデル: Peng-Robinson (PR) 状態方程式</h4>
+<p>
+<code>densitySinglePhase</code> は表引きを使わず、PR 状態方程式から解析的に密度を計算する。
+PR EOS は炭化水素・冷媒など幅広い流体に適用できる汎用立方状態方程式であり、
+流体ごとに必要なパラメータが少ない（流体固有データを 4 個だけ持てばよい）という利点がある。
+複数流体への展開（テーブル再生成が不要）を重視してこの方式を採用した。
+</p>
+
+<h5>状態方程式</h5>
+<pre>
+p = R·T / (v - b) - a(T) / (v² + 2bv - b²)
+</pre>
+<p>
+ここで <code>v</code> はモル体積 [m³/mol]、<code>R</code> は気体定数。
+パラメータ <code>a(T)</code>, <code>b</code> は臨界点物性と離心因子から次式で決まる。
+</p>
+<pre>
+a(T) = 0.45724 · R²·Tc² / pc · α(T)
+b    = 0.07780 · R·Tc / pc
+α(T) = [1 + κ·(1 - √(T/Tc))]²
+κ    = 0.37464 + 1.54226·ω - 0.26992·ω²
+</pre>
+<p>
+<code>0.45724</code>, <code>0.07780</code>, <code>0.37464</code>, <code>1.54226</code>, <code>0.26992</code>
+は PR EOS の普遍定数であり、流体には依存しない（Peng &amp; Robinson, 1976）。
+流体ごとに異なるのは臨界温度 <code>Tc</code>、臨界圧力 <code>pc</code>、離心因子 <code>ω</code> のみ。
+</p>
+
+<h5>圧縮因子 Z の3次方程式（<code>prSolveZ</code>）</h5>
+<p>
+無次元パラメータ <code>A = a(T)·p/(R·T)²</code>, <code>B = b·p/(R·T)</code> を用いると、
+圧縮因子 <code>Z = p·v/(R·T)</code> は次の3次方程式の根として得られる。
+</p>
+<pre>
+Z³ - (1-B)·Z² + (A - 3B² - 2B)·Z - (AB - B² - B³) = 0
+</pre>
+<p>
+液相条件では最小の実根、気相条件では最大の実根を採用する
+（<code>prSolveZ</code> の <code>liquid</code> 引数で切替）。
+判別式 D の符号に応じて Cardano の公式（実根1つ）または三角関数法（実根3つ）で解く。
+密度は <code>d = MM·p / (Z·R·T)</code> から得られる（<code>prDensity</code>）。
+</p>
+
+<h5>流体ごとに必要なパラメータ</h5>
+<table border=\"1\" cellspacing=\"0\">
+<tr><th>定数</th><th>役割</th></tr>
+<tr><td><code>T_critical</code></td><td>臨界温度 Tc [K]</td></tr>
+<tr><td><code>p_critical</code></td><td>臨界圧力 pc [Pa]</td></tr>
+<tr><td><code>omega_const</code></td><td>離心因子 ω (Pitzer acentric factor)</td></tr>
+<tr><td><code>MM_const</code></td><td>モル質量 [kg/mol]</td></tr>
+</table>
+<p>
+4 つすべて CoolProp から取得できる（<code>python/coolprop_utils.py</code> の
+<code>get_fluid_constants</code>、生成スクリプトは <code>python/methane/constants.py</code>）。
+</p>
+
+<h5>精度・既知の制限</h5>
+<ul>
+<li>気相密度: 誤差 1% 程度。低圧～中圧の気相に対して良好な精度を持つ。</li>
+<li>液相密度: 誤差 10～30% に達することがある（特に還元温度 T/Tc が低い極低温液体）。
+    PR EOS は元来気相向けに開発された式であり、液相密度は系統的に過小評価される傾向がある。</li>
+<li>体積補正（Péneloux 補正）を加えると液相誤差を大幅に改善できるが、現時点では未実装
+    （次の増分として検討中）。</li>
+<li><b><code>densitySinglePhase(p, h)</code> は現状、T に飽和温度 <code>sat.Tsat</code> を暫定的に使用している。</b>
+    真の温度 T(p,h) を求める実装（NASA 多項式による理想気体エンタルピーを前提とした Newton 反復）は
+    未着手であり、過冷却・過熱状態での温度・密度精度は限定的。</li>
+<li>NASA 多項式・Péneloux 補正は現段階では実装しない（PR EOS のみの単相密度実装にとどめる方針）。</li>
 </ul>
 </html>"));
 end PartialTwoPhaseMedium;
