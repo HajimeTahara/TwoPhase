@@ -1,70 +1,26 @@
 within EAST.TwoPhaseFlow.Examples;
-model TestPipeWithSource
-  "LCH 加熱管：過冷却液入口 → 二相出口の例題"
 
+model TestPipeWithSource "LCH 加熱管：過冷却液入口 → 二相出口の例題"
   // LCH（液体メタン）を媒体として選択
   package Medium = EAST.TwoPhaseFlow.Media.LCH;
-
   // -----------------------------------------------------------------
   // コンポーネント
   // -----------------------------------------------------------------
-
-  EAST.TwoPhaseFlow.Component.Sources.MassFlowSource_h source(
-    redeclare package Medium = Medium,
-    m_flow_set = 0.5,
-    h_set      = 30000.0)
-    "上流境界：流量 0.5 kg/s, h = 30 kJ/kg（5 bar 過冷却液 ≈ 128 K）";
-
-  EAST.TwoPhaseFlow.Component.Pipes.Pipe pipe(
-    redeclare package Medium = Medium,
-    L      = 5.0,
-    D      = 0.025,
-    dp     = 10000.0,
-    Q_flow = 50000.0)
-    "加熱管：管長 5 m, 内径 25 mm, 圧損 10 kPa, 入熱 50 kW";
-
-  EAST.TwoPhaseFlow.Component.Sources.Boundary_ph sink(
-    redeclare package Medium = Medium,
-    p_set = 4.9e5,
-    h_set = 1.3e5)
-    "下流境界：圧力 4.9 bar（逆流時エンタルピー = 130 kJ/kg）";
-
-  // -----------------------------------------------------------------
-  // 観測変数（入口）
-  // -----------------------------------------------------------------
-  Modelica.Units.SI.Temperature      T_in    "入口温度 [K]";
-  Modelica.Units.SI.Density          d_in    "入口密度 [kg/m³]";
-  Integer                            phase_in "入口相状態 (1=単相, 2=二相)";
-
-  // -----------------------------------------------------------------
-  // 観測変数（出口）
-  // -----------------------------------------------------------------
-  Modelica.Units.SI.Temperature      T_out    "出口温度 [K]（二相では飽和温度）";
-  Modelica.Units.SI.Density          d_out    "出口密度 [kg/m³]（HEM 混合密度）";
-  Integer                            phase_out "出口相状態 (1=単相, 2=二相)";
-  Real                               x_out    "出口乾き度 [-]（0=飽和液, 1=飽和蒸気）";
-  Real                               alpha_out "出口ボイド率 [-]（HEM）";
-
+  EAST.TwoPhaseFlow.Component.Sources.MassFlowSource_h source(redeclare package Medium = Medium, m_flow_set = 0.5, h_set = 30000.0) "上流境界：流量 0.5 kg/s, h = 30 kJ/kg（5 bar 過冷却液 ≈ 128 K）" annotation(
+    Placement(transformation(extent = {{-90, -15}, {-60, 15}})));
+  EAST.TwoPhaseFlow.Component.Pipes.Pipe pipe(redeclare package Medium = Medium, L = 5.0, D = 0.025, dp = 10000.0, Q_flow = 50000.0) "加熱管：管長 5 m, 内径 25 mm, 圧損 10 kPa, 入熱 50 kW" annotation(
+    Placement(transformation(origin = {-8, 21}, extent = {{-20, -16}, {20, 16}})));
+  EAST.TwoPhaseFlow.Component.Sources.Boundary_ph sink(redeclare package Medium = Medium, p_set = 4.9e5, h_set = 1.3e5) "下流境界：圧力 4.9 bar（逆流時エンタルピー = 130 kJ/kg）" annotation(
+    Placement(transformation(extent = {{90, -15}, {60, 15}})));
 equation
-  // --- コンポーネント接続 ---
-  connect(source.port, pipe.port_a);
-  connect(pipe.port_b,  sink.port);
-
-  // --- 入口物性（BaseProperties から取得）---
-  T_in     = pipe.props_a.T;
-  d_in     = pipe.props_a.d;
-  phase_in = pipe.props_a.phase;
-
-  // --- 出口物性（BaseProperties + Medium 関数から取得）---
-  T_out     = pipe.props_b.T;
-  d_out     = pipe.props_b.d;
-  phase_out = pipe.props_b.phase;
-  x_out     = Medium.vapourQuality(pipe.props_b.state);
-  alpha_out = Medium.voidFraction(pipe.props_b.state);
-
-  annotation (
-    experiment(StopTime=1.0),
-    Documentation(info="<html>
+// --- コンポーネント接続 ---
+  connect(source.port, pipe.port_a) annotation(
+    Line(points = {{-60, 0}, {-45, 0}, {-45, 21}, {-28, 21}}, color = {0, 127, 255}, thickness = 0.5));
+  connect(pipe.port_b, sink.port) annotation(
+    Line(points = {{12, 21}, {45, 21}, {45, 0}, {60, 0}}, color = {0, 127, 255}, thickness = 0.5));
+  annotation(
+    experiment(StopTime = 1.0),
+    Documentation(info = "<html>
 <h4>概要</h4>
 <p>
 液体メタン（LCH）が加熱管を流れる際の相変化を示す最小構成例。
