@@ -13,5 +13,6 @@ package EAST "統合熱流体ライブラリ"
 <li><code>Thermal</code> — MSL Thermal を参考にした熱系ライブラリ</li>
 </ul>
 </html>"),
-    version="0.1.0");
+    version="0.1.0",
+  uses(Modelica(version = "4.1.0")));
 end EAST;

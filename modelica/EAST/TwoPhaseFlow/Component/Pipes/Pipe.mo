@@ -1,104 +1,108 @@
 within EAST.TwoPhaseFlow.Component.Pipes;
-model Pipe
-  "定常管モデル（圧損・入熱パラメータ直接指定）"
 
-  replaceable package Medium = EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium
-    annotation (choicesAllMatching=true);
-
-  // ジオメトリ（将来の圧損・熱伝達相関式で参照）
-  parameter Modelica.Units.SI.Length   L = 1.0  "管長 [m]";
+model Pipe "動的管モデル（N 分割 CV チェーンで流体の移流を近似; セグメントごとの HeatPort を公開）"
+  replaceable package Medium = EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium annotation(
+    choicesAllMatching = true);
+  // ジオメトリ（圧損・熱伝達相関式に加え、管内総容積 V の計算にも使用）
+  parameter Modelica.Units.SI.Length L = 1.0 "管長 [m]";
   parameter Modelica.Units.SI.Diameter D = 0.01 "内径 [m]";
-
-  // 直接指定パラメータ
-  parameter Modelica.Units.SI.PressureDifference dp(min=0) = 0
-    "圧力損失 [Pa]（port_a → port_b 方向）";
-  parameter Modelica.Units.SI.HeatFlowRate Q_flow = 0
-    "入熱量 [W]（正: 加熱、負: 冷却）";
-
+  final parameter Modelica.Units.SI.Area crossArea = Modelica.Constants.pi/4 * D^2 "管断面積 [m²]";
+  final parameter Modelica.Units.SI.Volume V = crossArea * L "管内総容積 [m³]";
+  // 軸方向分割（移流の近似精度; 1 にすると従来の単一 CV モデルと等価）
+  parameter Integer nNodes(min = 1) = 3 "軸方向の分割数（直列接続する制御容積の数）";
+  // 直接指定パラメータ（各セグメントに等分配）
+  parameter Modelica.Units.SI.PressureDifference dp(min = 0) = 0 "管全体の圧力損失 [Pa]（nNodes 個のセグメントに等分配）";
+  // 初期条件（既定値: p_start における飽和液; 全セグメント共通）
+  parameter Modelica.Units.SI.AbsolutePressure p_start = 1.0e5 "各セグメント CV 内圧力の初期値 [Pa]";
+  parameter Modelica.Units.SI.SpecificEnthalpy h_start = Medium.bubbleEnthalpy(Medium.setSat_p(p_start)) "各セグメント CV 内比エンタルピーの初期値 [J/kg]（既定: p_start における飽和液）";
   // ポート
-  EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_a port_a(redeclare package Medium = Medium)
-    "上流ポート（入口）"
-    annotation (Placement(transformation(extent={{-110,-10},{-90,10}})));
-  EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_b port_b(redeclare package Medium = Medium)
-    "下流ポート（出口）"
-    annotation (Placement(transformation(extent={{90,-10},{110,10}})));
+  EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_a port_a(redeclare package Medium = Medium) "上流ポート（入口）" annotation(
+    Placement(transformation(extent = {{-110, -10}, {-90, 10}})));
+  EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_b port_b(redeclare package Medium = Medium) "下流ポート（出口）" annotation(
+    Placement(transformation(extent = {{90, -10}, {110, 10}})));
+  EAST.TwoPhaseFlow.Component.Interfaces.HeatPort_a heatPorts[nNodes]
+    "各セグメントへの外部熱ポート"
+    annotation (Placement(
+      transformation(extent={{-10,40},{10,60}}),
+      iconTransformation(extent={{-10,40},{10,60}})));
 
-  // 流量・エンタルピー
-  Modelica.Units.SI.MassFlowRate     m_flow "質量流量 [kg/s]（a→b 方向正）";
-  Modelica.Units.SI.SpecificEnthalpy h_in  "入口比エンタルピー [J/kg]";
-  Modelica.Units.SI.SpecificEnthalpy h_out "出口比エンタルピー [J/kg]";
-
-  // 入口・出口の流体状態（温度・密度・相・飽和物性を参照可能）
-  Medium.BaseProperties props_a "入口流体状態";
-  Medium.BaseProperties props_b "出口流体状態";
-
+  PipeSegment segment[nNodes](
+    redeclare each package Medium = Medium,
+    each V = V/nNodes,
+    each dp = dp/nNodes,
+    each p_start = p_start,
+    each h_start = h_start) "直列接続された制御容積（管内流体の移流を近似）" annotation(
+    Placement(transformation(origin = {-7, -72}, extent = {{-17, -16}, {17, 16}})));
 equation
-  // --- 質量保存（定常）---
-  port_a.m_flow + port_b.m_flow = 0;
-  m_flow = port_a.m_flow;
-
-  // --- 圧力損失（port_a → port_b 方向）---
-  port_b.p = port_a.p - dp;
-
-  // --- 入口エンタルピー（stream 変数から取得）---
-  h_in = inStream(port_a.h_outflow);
-
-  // --- エネルギー保存（定常）---
-  // 積形式にすることで m_flow = 0, Q_flow = 0 時に 0 = 0 と整合する
-  m_flow * h_out = m_flow * h_in + Q_flow;
-
-  // --- 流体状態の計算（BaseProperties 経由）---
-  props_a.p = port_a.p;
-  props_a.h = h_in;
-  props_b.p = port_b.p;
-  props_b.h = h_out;
-
-  // --- Stream 変数の束縛 ---
-  port_b.h_outflow = h_out;                       // 正流（a→b）時の出口エンタルピー
-  port_a.h_outflow = inStream(port_b.h_outflow);  // 逆流（b→a）時はパススルー近似
-
-  annotation (
-    Icon(coordinateSystem(preserveAspectRatio=false), graphics={
-      Rectangle(
-        extent={{-100,30},{100,-30}},
-        lineColor={0,0,255},
-        fillColor={0,128,255},
-        fillPattern=FillPattern.HorizontalCylinder),
-      Text(
-        extent={{-100,60},{100,42}},
-        lineColor={0,0,0},
-        textString="%name")}),
-    Documentation(info="<html>
+// --- セグメントの直列接続（管内流体の移流を表現）---
+  connect(port_a, segment[1].port_a);
+  for i in 1:nNodes - 1 loop
+    connect(segment[i].port_b, segment[i + 1].port_a);
+  end for;
+  connect(segment[nNodes].port_b, port_b);
+// --- HeatPort（セグメントごとに外部へ公開）---
+  for i in 1:nNodes loop
+    connect(heatPorts[i], segment[i].heatPort);
+  end for;
+  annotation(
+    Icon(coordinateSystem(preserveAspectRatio = false), graphics = {Rectangle(extent = {{-100, 30}, {100, -30}}, lineColor = {0, 0, 255}, fillColor = {0, 128, 255}, fillPattern = FillPattern.HorizontalCylinder), Text(extent = {{-100, 60}, {100, 42}}, lineColor = {0, 0, 0}, textString = "%name")}),
+    Documentation(info = "<html>
 <p>
-定常単相・二相管モデル。圧力損失 <code>dp</code> と入熱量 <code>Q_flow</code> を
-パラメータで直接指定する簡易版。
+動的単相・二相管モデル。管内総容積 <code>V = L &middot; &pi;/4 &middot; D&sup2;</code> を
+<code>nNodes</code> 個の <code>SimplePipeSegment</code>（各容積 <code>V/nNodes</code> の
+軽量 well-mixed セグメント）に分割し、直列接続することで管内流体の移流（軸方向の質量・
+エンタルピー輸送）を近似する。<code>nNodes = 1</code> の場合は単一 CV モデルと等価。
 </p>
 
-<h4>方程式</h4>
+<h4>構成</h4>
+<pre>
+port_a → segment[1] → segment[2] → ... → segment[nNodes] → port_b
+</pre>
+<p>
+各セグメントの方程式（質量・エネルギー蓄積、圧力、stream 変数、HeatPort 温度）は
+<code>SimplePipeSegment</code> を参照。セグメント間は <code>FluidPort</code> の
+<code>connect()</code> によって接続され、<code>port_b.h_outflow</code>（上流セグメントの
+出口エンタルピー）が下流セグメントの入口エンタルピーとして自然に伝播する。これにより、
+初期に管内にあった流体が入口側から流入する流体によって時間をかけて押し出される
+（移流）挙動が再現される。
+</p>
+
+<h4>圧力損失・初期条件</h4>
 <ul>
-<li>質量保存（定常）: <code>port_a.m_flow + port_b.m_flow = 0</code></li>
-<li>圧力降下: <code>port_b.p = port_a.p - dp</code></li>
-<li>エネルギー保存（定常）:
-    <code>m_flow &middot; h_out = m_flow &middot; h_in + Q_flow</code></li>
+<li><code>dp</code>（管全体の圧力損失）は <code>nNodes</code> 個のセグメントへ均等分配
+    （各セグメント <code>dp/nNodes</code>）。</li>
+<li><code>p_start</code>, <code>h_start</code> は全セグメント共通の初期条件。
+    <code>h_start</code> の既定値は <code>p_start</code> における飽和液エンタルピー。</li>
 </ul>
+
+<h4>HeatPort</h4>
+<p>
+外側に公開する <code>heatPorts[nNodes]</code> は、各 <code>SimplePipeSegment</code> の
+<code>heatPort</code> と 1 対 1 で接続される。これにより DiagramView 上で
+セグメントごとに異なる熱境界条件を直接接続できる。
+管全体へ単一 HeatPort から一様入熱を与えたい場合は、ラッパーモデル
+<code>PipeUniformHeatTransfer</code> を使用する。
+</p>
 
 <h4>参照可能な内部変数</h4>
 <ul>
-<li><code>props_a.T</code>, <code>props_a.d</code>, <code>props_a.phase</code>
-    — 入口の温度・密度・相</li>
-<li><code>props_b.T</code>, <code>props_b.d</code>, <code>props_b.phase</code>
-    — 出口の温度・密度・相</li>
-<li><code>props_a.sat</code>, <code>props_b.sat</code>
-    — 入口・出口圧力での飽和物性（泡点/露点エンタルピー・密度・温度）</li>
+<li><code>segment[i].props.T</code>, <code>segment[i].props.d</code>,
+    <code>segment[i].props.phase</code> — i 番目セグメントの温度・密度・相
+    （管軸方向の分布を確認できる）</li>
 </ul>
 
 <h4>制限事項・将来拡張</h4>
 <ul>
-<li>定常モデル: 流体の慣性・蓄積は考慮しない</li>
-<li>逆流（b→a）時のエンタルピー変化は計算しない（パススルー近似）</li>
-<li><code>m_flow = 0</code> かつ <code>Q_flow &ne; 0</code> は定常的に矛盾する条件</li>
-<li>将来: <code>dp</code> を Friedel / Lockhart-Martinelli 等の相関式に、
-    <code>Q_flow</code> を沸騰・凝縮熱伝達相関式に置き換え可能</li>
+<li><code>nNodes</code> が小さいほど数値拡散（セグメント内の井戸混合による平滑化）が大きく、
+    プラグフローからのずれが大きくなる。<code>nNodes</code> を増やすほど精度は上がるが
+    計算コストも増える。</li>
+<li><code>dp</code> は流量・物性に依存しない固定値（将来: Friedel / Lockhart-Martinelli 等の
+    相関式に置き換え可能）</li>
+<li>セグメントごとの個別入熱は <code>heatPorts[i]</code> へ接続して与える。</li>
+<li>各セグメントは代表密度 <code>d_nominal</code> による
+    <code>M_nominal der(h)</code> 型の軽量エンタルピー遅れであり、
+    厳密な圧縮性・質量蓄積は表現しない。熱流は入口・出口の比エンタルピー差として
+    反映される。</li>
 </ul>
 </html>"));
 end Pipe;

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"c:/Users/hajime/projects/fluid/TwoPhase\" status)",
+      "Bash(git -C \"c:/Users/hajime/projects/fluid/TwoPhase\" diff)",
+      "Bash(git -C \"c:/Users/hajime/projects/fluid/TwoPhase\" log --oneline -3)",
+      "Bash(git -C \"c:/Users/hajime/projects/fluid/TwoPhase\" add CLAUDE.md TwoPhaseMedia/Interfaces/PartialTwoPhaseMedium.mo TwoPhaseMedia/LCH/package.mo TwoPhaseMedia/LCH/package.order docs/)",
+      "Bash(git -C c:/Users/hajime/projects/fluid/TwoPhase commit -m ' *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(py methane/constants.py)"
+    ]
+  }
+}

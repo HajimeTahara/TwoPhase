@@ -44,3 +44,124 @@
 - コード内の絶対参照 `TwoPhaseFlow.*` / `Thermal.*` を `EAST.TwoPhaseFlow.*` / `EAST.Thermal.*` に修正。
 - `modelica/EAST/TwoPhaseFlow/package.order` を現構成の `Media`、`Component`、`Examples` に修正。
 - `AGENTS.md` のリポジトリ構成と Thermal / 媒体設計方針の参照名を `EAST` 階層に更新。
+
+---
+
+## 追記: Pipe の分布 HeatPort 化と一様入熱ラッパー追加
+
+### 背景
+
+`Pipe` が内部で `PipeSegment[nNodes]` を持つ一方、外部 HeatPort が単一だったため、
+DiagramView 上でセグメントごとの熱境界条件を直接接続しにくく、熱流分配式と未接続 flow 変数の扱いも複雑になっていた。
+
+### 変更ファイル
+
+- `modelica/EAST/TwoPhaseFlow/Component/Pipes/Pipe.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/Pipes/PipeUniformHeatTransfer.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/Pipes/package.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/Pipes/package.order`
+
+### 変更内容
+
+- 基本モデル `Pipe` は `heatPorts[nNodes]` を外部へ公開し、各 `PipeSegment.heatPort` と 1 対 1 で `connect()` する構成に変更。
+- 単一 HeatPort から各セグメントへ一様に熱流を分配するラッパーモデル `PipeUniformHeatTransfer` を追加。
+- `PipeUniformHeatTransfer.heatPort.T` は各セグメント HeatPort 温度の単純平均で代表する。
+
+---
+
+## 追記: TestPipeWithSource の熱交換接続修正
+
+### 変更ファイル
+
+- `modelica/EAST/TwoPhaseFlow/Examples/TestPipeWithSource.mo`
+
+### 変更内容
+
+- `pipe` を `Pipe` から `PipeUniformHeatTransfer` に変更。
+- `Modelica.Thermal.HeatTransfer.Components.Convection.fluid` を `pipe.heatPort` に接続。
+- ドキュメントを、`MassFlowSource_T`、`PipeUniformHeatTransfer`、`FixedTemperature + Convection` の構成に合わせて更新。
+
+---
+
+## 追記: PipeUniformHeatTransfer の過剰決定エラー修正
+
+### 背景
+
+`PipeUniformHeatTransfer` 内で protected の `HeatPort` 配列を作り、そこへ直接
+`Q_flow` 分配式を書いていたところ、OpenModelica で未接続 flow 変数の自動 `0` 方程式と衝突し、
+過剰決定システムになった。
+
+### 変更ファイル
+
+- `modelica/EAST/TwoPhaseFlow/Component/HeatSources/UniformHeatDistributor.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/HeatSources/package.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/HeatSources/package.order`
+- `modelica/EAST/TwoPhaseFlow/Component/Pipes/PipeUniformHeatTransfer.mo`
+
+### 変更内容
+
+- 単一 HeatPort から複数 HeatPort へ熱流を均等分配する `UniformHeatDistributor` を追加。
+- `PipeUniformHeatTransfer` は内部の protected HeatPort 配列を廃止し、`UniformHeatDistributor` を介して
+  `pipe.heatPorts[:]` に `connect()` する構成へ変更。
+- `heatPort.T` の代表温度は、分配先 HeatPort 温度の単純平均として `UniformHeatDistributor` 側で計算する。
+
+### 未確認事項
+
+- この環境では `omc` が見つからないため、OpenModelica での再コンパイル確認は未実施。
+
+---
+
+## 追記: SimplePipeSegment の追加
+
+### 背景
+
+`PipeSegment` は `der(M)` / `der(U)` を含む厳密寄りの動的 CV であり、OpenModelica が
+`Medium.setState_ph` や密度・内部エネルギー関数の時間微分を生成しようとして、
+tearing 変数選択と非線形残差生成で失敗した。MSL の `Thermal.FluidHeatFlow.Components.Pipe`
+に近い軽量構成へ寄せるため、比エンタルピー遅れのみを状態として扱うセグメントを追加した。
+
+### 変更ファイル
+
+- `modelica/EAST/TwoPhaseFlow/Component/Pipes/SimplePipeSegment.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/Pipes/Pipe.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/Pipes/package.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/Pipes/package.order`
+
+### 変更内容
+
+- `SimplePipeSegment` を追加。
+- `SimplePipeSegment` は `port_a.m_flow + port_b.m_flow = 0` とし、質量蓄積を解かない。
+- 動的式は `M_nominal * der(h)` 型のエンタルピー遅れに限定し、`M_nominal = d_nominal * V` とした。
+- 相状態・温度・密度は `Medium.BaseProperties(p, h)` で診断的に計算する。
+- `Pipe` の内部セグメント配列を `PipeSegment` から `SimplePipeSegment` に切り替えた。
+- Source モデルは既存の `MassFlowSource_T` / `Boundary_ph` で接続条件が成立するため追加しなかった。
+
+### 未確認事項
+
+- この環境では `omc` が見つからないため、OpenModelica での再コンパイル確認は未実施。
+- `d_nominal` は初期状態から決まる代表密度なので、相変化で密度が大きく変わる場合の滞留時間は近似になる。
+
+---
+
+## 追記: SimplePipeSegment の入口・出口エンタルピー差対応
+
+### 背景
+
+初期実装の `SimplePipeSegment` は代表比エンタルピー `h` を両ポートの `h_outflow` に与えていたため、
+加熱しても入口と出口の比エンタルピー差が明示的に現れにくい構成だった。
+MSL の `Modelica.Thermal.FluidHeatFlow.Components.Pipe` と同程度の簡易モデルとして、
+熱流を入口・出口の比エンタルピー差へ直接反映する形に変更した。
+
+### 変更ファイル
+
+- `modelica/EAST/TwoPhaseFlow/Component/Pipes/SimplePipeSegment.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/Pipes/Pipe.mo`
+
+### 変更内容
+
+- `SimplePipeSegment` に `m_flow`, `h_a_in`, `h_b_in` を追加。
+- 正流時は `M_nominal * der(h) = m_flow * (h_a_in - port_b.h_outflow) + heatPort.Q_flow` とし、
+  `h = (h_a_in + port_b.h_outflow) / 2` で代表状態を定義した。
+- 逆流時も同じ形で `port_a.h_outflow` を出口側として扱う分岐を追加した。
+- 定常正流では `port_b.h_outflow = h_a_in + heatPort.Q_flow / m_flow` となるため、
+  入熱に応じて入口・出口の比エンタルピー差が出る。
