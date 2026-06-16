@@ -370,19 +370,21 @@ partial package PartialTwoPhaseMedium
   end prDensity;
 
   function densitySinglePhase
-    "単相密度 [kg/m³]（PR EOS; T は飽和温度で近似。T(p,h) 実装後に精度向上）"
+    "単相密度 [kg/m³]（PR EOS; T は temperatureSinglePhase(p,h) で近似）"
     input  AbsolutePressure p;
     input  SpecificEnthalpy h;
     output Density          d;
   protected
     SaturationProperties sat;
+    Temperature T;
   algorithm
     sat := setSat_p(p);
-    d   := prDensity(p, sat.Tsat, h < sat.h_bubble);
+    T   := temperatureSinglePhase(p, h);
+    d   := prDensity(p, T, h < sat.h_bubble);
   end densitySinglePhase;
 
   function temperatureSinglePhase
-    "単相温度 [K]（暫定: 飽和温度を返す。NASA 多項式 + PR 実装待ち）"
+    "単相温度 [K]（飽和点から代表定圧比熱で線形外挿）"
     input  AbsolutePressure p;
     input  SpecificEnthalpy h;
     output Temperature      T;
@@ -390,7 +392,11 @@ partial package PartialTwoPhaseMedium
     SaturationProperties sat;
   algorithm
     sat := setSat_p(p);
-    T   := sat.Tsat;
+    if h <= sat.h_bubble then
+      T := sat.Tsat + (h - sat.h_bubble) / cp_liquid_const;
+    else
+      T := sat.Tsat + (h - sat.h_dew) / cp_vapor_const;
+    end if;
   end temperatureSinglePhase;
 
   function specificEnthalpy_pT
@@ -490,7 +496,8 @@ Z³ - (1-B)·Z² + (A - 3B² - 2B)·Z - (AB - B² - B³) = 0
     PR EOS は元来気相向けに開発された式であり、液相密度は系統的に過小評価される傾向がある。</li>
 <li>体積補正（Péneloux 補正）を加えると液相誤差を大幅に改善できるが、現時点では未実装
     （次の増分として検討中）。</li>
-<li><b><code>densitySinglePhase(p, h)</code> は現状、T に飽和温度 <code>sat.Tsat</code> を暫定的に使用している。</b>
+<li><b><code>temperatureSinglePhase(p, h)</code> は現状、飽和点から代表定圧比熱で線形外挿している。</b>
+    <code>densitySinglePhase(p, h)</code> はこの温度を PR EOS に渡す。
     真の温度 T(p,h) を求める実装（NASA 多項式による理想気体エンタルピーを前提とした Newton 反復）は
     未着手であり、過冷却・過熱状態での温度・密度精度は限定的。</li>
 <li>NASA 多項式・Péneloux 補正は現段階では実装しない（PR EOS のみの単相密度実装にとどめる方針）。</li>

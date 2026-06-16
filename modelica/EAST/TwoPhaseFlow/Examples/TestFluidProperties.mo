@@ -3,17 +3,24 @@ model TestFluidProperties
   "LCH 流体の BaseProperties 使用例"
   package Medium = EAST.TwoPhaseFlow.Media.LCH;
 
+  parameter Modelica.Units.SI.SpecificEnthalpy h_start = 0
+    "開始時の比エンタルピー [J/kg]";
+  parameter Modelica.Units.SI.SpecificEnthalpy h_end = 600000
+    "終了時の比エンタルピー [J/kg]";
+  parameter Modelica.Units.SI.Time rampDuration(min=Modelica.Constants.eps) = 100.0
+    "比エンタルピーを線形変化させる時間 [s]";
+
   Medium.BaseProperties props(preferredMediumStates=true);
 
 equation
-  // 独立変数を外部から与える（2 bar、液相域）
-  props.p = 200000.0;   // 圧力 [Pa]
-  props.h = 400000.0;   // 比エンタルピー [J/kg]
+  // 独立変数を外部から与える（p は固定、h は時間で線形変化）
+  props.p = 4.9e+5;   // 圧力 [Pa]
+  props.h = h_start + (h_end - h_start) * min(time / rampDuration, 1.0);
 
   // 結果として props.d, props.T, props.u, props.phase が算出される
 
   annotation(
-    experiment(StopTime=1.0),
+    experiment(StopTime=100.0),
     Documentation(info="<html>
 <p>
 LCH（液体メタン）パッケージを使った最小構成の使用例。
