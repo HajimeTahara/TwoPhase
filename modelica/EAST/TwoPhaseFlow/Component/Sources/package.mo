@@ -18,6 +18,11 @@ MSL の <code>Modelica.Fluid.Sources</code> に相当する。
 定積比熱近似）で温度を比エンタルピーに変換する。飽和点から離れた条件では
 精度が低い点に注意（詳細は <code>PartialTwoPhaseMedium</code> のドキュメンテーション参照）。
 </p>
+<p>
+各モデルは <code>use_p_in</code>、<code>use_T_in</code>、<code>use_h_in</code>、
+<code>use_m_flow_in</code> のうち対応する Boolean パラメータを持ち、
+<code>true</code> にすると固定パラメータの代わりに外部入力コネクタから境界条件を与えられる。
+</p>
 <h4>接続規則</h4>
 <p>
 両モデルとも <code>FluidPort_b</code> 型の <code>port</code> を持つ。

@@ -35,6 +35,9 @@ python/
 ├── methane/
 └── output/
 
+ModelicaStandardLibrary/
+└── Fluid/ など MSL 参照用ファイル
+
 docs/
 ├── claude/
 └── codex/
@@ -49,6 +52,7 @@ docs/
 - Modelica エンティティの追加・削除・並べ替えを行う場合は、対応する `package.order` も更新します。
 - 命名規則は MSL に合わせます。パッケージは `UpperCamelCase`、変数・定数・パラメータは `lowerCamelCase` とします。
 - 物理量には SI 単位アノテーションを付けます。
+- `ModelicaStandardLibrary/` は MSL 参照用としてリポジトリ内に配置されています。実装方針や API 形状の確認に利用して構いませんが、原則として変更しないでください。
 
 ## Thermal パッケージ方針
 

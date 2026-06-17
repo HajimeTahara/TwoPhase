@@ -63,3 +63,51 @@
 ### 変更理由
 
 `p = 4.9e5 Pa` では二相域がおよそ `84163 < h < 543402 J/kg` なので、既定値を `h_start = 0`, `h_end = 600000` として、単相液、二相、単相蒸気を 1 回のシミュレーションで確認できるようにした。
+
+## 追記: Examples パッケージのフォルダ整理
+
+### 議題
+
+`EAST.TwoPhaseFlow.Examples` 配下で、`Media.mo` / `Pipes.mo` の package 内に model が直接定義されていたため、リポジトリの 1 エンティティ = 1 ファイル規則に合わせて整理した。
+
+### 変更ファイル
+
+- `modelica/EAST/TwoPhaseFlow/Examples/Media/package.mo`
+- `modelica/EAST/TwoPhaseFlow/Examples/Media/package.order`
+- `modelica/EAST/TwoPhaseFlow/Examples/Media/TestFluidProperties.mo`
+- `modelica/EAST/TwoPhaseFlow/Examples/Pipes/package.mo`
+- `modelica/EAST/TwoPhaseFlow/Examples/Pipes/package.order`
+- `modelica/EAST/TwoPhaseFlow/Examples/Pipes/TestPipeWithSource.mo`
+- `modelica/EAST/TwoPhaseFlow/Examples/Pipes/TestPipeSegment.mo`
+- `modelica/EAST/TwoPhaseFlow/Examples/package.mo`
+
+### 変更理由
+
+Modelica の package/model をファイル単位に分離し、`package.mo` は package 宣言と annotation のみ、所属順は `package.order` で管理する構成に戻した。
+
+### 残作業
+
+- OpenModelica 環境で `EAST.TwoPhaseFlow.Examples.Media.TestFluidProperties`、`EAST.TwoPhaseFlow.Examples.Pipes.TestPipeWithSource`、`EAST.TwoPhaseFlow.Examples.Pipes.TestPipeSegment` のロードと変換を確認する。
+
+## 追記: Sources 境界条件の外部入力化
+
+### 議題
+
+`EAST.TwoPhaseFlow.Component.Sources` の境界条件モデルで、流量・圧力・温度・比エンタルピーを固定パラメータだけでなく外部入力から与えられるようにした。
+
+### 変更ファイル
+
+- `modelica/EAST/TwoPhaseFlow/Component/Sources/Boundary_ph.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/Sources/Boundary_pT.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/Sources/MassFlowSource_h.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/Sources/MassFlowSource_T.mo`
+- `modelica/EAST/TwoPhaseFlow/Component/Sources/package.mo`
+- `AGENTS.md`
+
+### 変更理由
+
+MSL の `Modelica.Fluid.Sources` にある `use_*_in` パターンを参考に、既定では従来通り固定パラメータを使い、Boolean スイッチを `true` にした場合のみ `RealInput` コネクタから境界値を与えられるようにした。
+
+### 残作業
+
+- OpenModelica 環境で、外部入力コネクタを有効にした各 Sources モデルのロードと接続テストを確認する。

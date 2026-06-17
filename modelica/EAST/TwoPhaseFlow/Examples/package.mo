@@ -6,9 +6,9 @@ package Examples "TwoPhaseFlow ライブラリの使用例"
 </p>
 <h4>使用例一覧</h4>
 <ul>
-<li><code>TestFluidProperties</code>  — BaseProperties の基本的な使い方</li>
-<li><code>TestVoidFraction</code>    — ボイド率計算</li>
-<li><code>TestPipeWithSource</code>  — MassFlowSource_h → Pipe → Boundary_ph の接続テスト</li>
+<li><code>Media.TestFluidProperties</code>  — BaseProperties の基本的な使い方</li>
+<li><code>Pipes.TestPipeWithSource</code>  — MassFlowSource_T → PipeSegment → Boundary_ph の接続テスト</li>
+<li><code>Pipes.TestPipeSegment</code>  — PipeSegment の加熱接続テスト</li>
 </ul>
 </html>"));
 end Examples;
