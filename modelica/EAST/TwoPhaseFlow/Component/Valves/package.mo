@@ -6,7 +6,7 @@ package Valves "バルブモデル群"
 MSL の <code>Modelica.Fluid.Valves</code> に倣ったバルブモデル群。
 </p>
 <ul>
-<li><code>ValveLinear</code> — 圧力差と開度に比例する線形バルブ</li>
+<li><code>ValveLinear</code> — Cv で容量を指定する線形開度バルブ</li>
 </ul>
 </html>"));
 end Valves;

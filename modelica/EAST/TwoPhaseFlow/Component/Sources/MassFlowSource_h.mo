@@ -1,7 +1,7 @@
 within EAST.TwoPhaseFlow.Component.Sources;
 model MassFlowSource_h
   "固定質量流量・固定比エンタルピー ソース"
-
+  extends EAST.Icons.MassFlowSource;
   replaceable package Medium = EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium
     annotation (choicesAllMatching=true);
 
@@ -12,10 +12,10 @@ model MassFlowSource_h
     "true の場合、比エンタルピーを入力コネクタ h_in から与える"
     annotation(Evaluate=true, HideResult=true, choices(checkBox=true));
   parameter Modelica.Units.SI.MassFlowRate    m_flow_set = 1.0
-    "固定質量流量 [kg/s]（正: port へ流出）"
+    "固定質量流量（正: port へ流出）"
     annotation (Dialog(enable = not use_m_flow_in));
   parameter Modelica.Units.SI.SpecificEnthalpy h_set    = 4.0e5
-    "流出流体の比エンタルピー [J/kg]"
+    "流出流体の比エンタルピー"
     annotation (Dialog(enable = not use_h_in));
 
   Modelica.Blocks.Interfaces.RealInput m_flow_in(unit="kg/s") if use_m_flow_in
@@ -51,21 +51,7 @@ equation
   port.h_outflow = h_in_internal;
 
   annotation (
-    Icon(coordinateSystem(preserveAspectRatio=false), graphics={
-      Ellipse(
-        extent={{-60,60},{60,-60}},
-        lineColor={0,127,255},
-        fillColor={0,127,255},
-        fillPattern=FillPattern.Solid),
-      Polygon(
-        points={{-20,30},{-20,-30},{40,0},{-20,30}},
-        lineColor={255,255,255},
-        fillColor={255,255,255},
-        fillPattern=FillPattern.Solid),
-      Text(
-        extent={{-100,80},{100,62}},
-        lineColor={0,0,0},
-        textString="%name")}),
+    Icon(coordinateSystem(preserveAspectRatio = false)),
     Documentation(info="<html>
 <p>
 質量流量 <code>m_flow_set</code> と比エンタルピー <code>h_set</code> を固定するソース境界。

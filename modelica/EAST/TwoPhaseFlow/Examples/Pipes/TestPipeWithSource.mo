@@ -7,34 +7,54 @@ extends Modelica.Icons.Example;
   // -----------------------------------------------------------------
   // コンポーネント
   // -----------------------------------------------------------------
-  EAST.TwoPhaseFlow.Component.Sources.Boundary_ph sink(redeclare package Medium = Medium, p_set = 4.9e5, h_set = 1.3e5) "下流境界：圧力 4.9 bar（逆流時エンタルピー = 130 kJ/kg）" annotation(
-    Placement(transformation(origin = {0, -54}, extent = {{90, -15}, {60, 15}})));
-  Component.Sources.MassFlowSource_T massFlowSource_T(redeclare package Medium = Medium, m_flow_set = 0.1, T_set = 93.15) annotation(
-    Placement(transformation(origin = {-126, -56}, extent = {{-10, -10}, {10, 10}})));
+  Component.Sources.MassFlowSource_T massFlowSource_T(redeclare package Medium = Medium, m_flow_set = 0.1, T_set = 93.15, use_m_flow_in = true, use_T_in = true) annotation(
+    Placement(transformation(origin = {-72, -36}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Components.Convection convection annotation(
-    Placement(transformation(origin = {-18, -10}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
+    Placement(transformation(origin = {-4, 38}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   Modelica.Blocks.Sources.Constant const(k = 0.1) annotation(
-    Placement(transformation(origin = {24, 98}, extent = {{-10, -10}, {10, 10}})));
-  Component.Pipes.DynamicPipeSegment dynamicPipeSegment(redeclare package Medium = Medium, V = 0.001) annotation(
-    Placement(transformation(origin = {-22, -54}, extent = {{-10, -10}, {10, 10}})));
+    Placement(transformation(origin = {34, 38}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
+  Component.Pipes.DynamicPipeSegment dynamicPipeSegment(
+    redeclare package Medium = Medium,
+    geometry = Component.Pipes.PipeGeometry.Circular,
+    length = 1,
+    diameter = sqrt(4*0.001/Modelica.Constants.pi)) annotation(
+    Placement(transformation(origin = {-4, -6}, extent = {{-10, -10}, {10, 10}})));
   Thermal.HeatTransfer.Components.HeatCapacitor heatCapacitor annotation(
-    Placement(transformation(origin = {-64, 72}, extent = {{-10, -10}, {10, 10}})));
+    Placement(transformation(origin = {-4, 70}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow fixedHeatFlow(Q_flow = 300) annotation(
-    Placement(transformation(origin = {-134, 76}, extent = {{-10, -10}, {10, 10}})));
+    Placement(transformation(origin = {-50, 70}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Blocks.Sources.Constant const1(k = 101325)  annotation(
+    Placement(transformation(origin = {122, -10}, extent = {{10, -10}, {-10, 10}})));
+  Component.Sources.Boundary_pT boundary_pT(use_p_in = true, use_T_in = true, redeclare package Medium = Medium)  annotation(
+    Placement(transformation(origin = {74, -34}, extent = {{10, -10}, {-10, 10}}, rotation = -0)));
+  Modelica.Blocks.Sources.Constant const11(k = 90) annotation(
+    Placement(transformation(origin = {120, -56}, extent = {{10, -10}, {-10, 10}})));
+  Modelica.Blocks.Sources.Constant const12(k = 0.1) annotation(
+    Placement(transformation(origin = {-114, -6}, extent = {{-10, -10}, {10, 10}}, rotation = -0)));
+  Modelica.Blocks.Sources.Constant const121(k = 90) annotation(
+    Placement(transformation(origin = {-116, -54}, extent = {{-10, -10}, {10, 10}})));
 equation
-  // --- コンポーネント接続 ---
+// --- コンポーネント接続 ---
   connect(const.y, convection.Gc) annotation(
-    Line(points = {{36, 98}, {52, 98}, {52, -10}, {-8, -10}}, color = {0, 0, 127}));
+    Line(points = {{23, 38}, {6, 38}}, color = {0, 0, 127}));
   connect(convection.fluid, dynamicPipeSegment.heatPort) annotation(
-    Line(points = {{-18, -20}, {-18, -39.5}, {-22, -39.5}, {-22, -47}}, color = {191, 0, 0}));
-  connect(massFlowSource_T.port, dynamicPipeSegment.port_a) annotation(
-    Line(points = {{-116, -56}, {-32, -56}, {-32, -54}}, color = {0, 127, 255}));
-  connect(dynamicPipeSegment.port_b, sink.port) annotation(
-    Line(points = {{-12, -54}, {60, -54}}, color = {0, 127, 255}));
+    Line(points = {{-4, 28}, {-4, -2}}, color = {191, 0, 0}));
   connect(fixedHeatFlow.port, heatCapacitor.port_left) annotation(
-    Line(points = {{-124, 76}, {-74, 76}, {-74, 72}}, color = {191, 0, 0}));
-  connect(heatCapacitor.port_right, convection.solid) annotation(
-    Line(points = {{-54, 72}, {-18, 72}, {-18, 0}}, color = {191, 0, 0}));
+    Line(points = {{-40, 70}, {-14, 70}}, color = {191, 0, 0}));
+  connect(massFlowSource_T.port, dynamicPipeSegment.port_a) annotation(
+    Line(points = {{-62, -36}, {-36, -36}, {-36, -6}, {-14, -6}}, color = {0, 0, 127}));
+  connect(heatCapacitor.port_bottom, convection.solid) annotation(
+    Line(points = {{-4, 60}, {-4, 48}}, color = {191, 0, 0}));
+  connect(dynamicPipeSegment.port_b, boundary_pT.port) annotation(
+    Line(points = {{6, -6}, {26, -6}, {26, -34}, {64, -34}}, color = {0, 0, 127}));
+  connect(boundary_pT.p_in, const1.y) annotation(
+    Line(points = {{86, -28}, {104, -28}, {104, -10}, {112, -10}}, color = {0, 0, 127}));
+  connect(boundary_pT.T_in, const11.y) annotation(
+    Line(points = {{86, -40}, {94, -40}, {94, -56}, {110, -56}}, color = {0, 0, 127}));
+  connect(const12.y, massFlowSource_T.m_flow_in) annotation(
+    Line(points = {{-102, -6}, {-92, -6}, {-92, -30}, {-84, -30}}, color = {0, 0, 127}));
+  connect(const121.y, massFlowSource_T.T_in) annotation(
+    Line(points = {{-105, -54}, {-92, -54}, {-92, -42}, {-84, -42}}, color = {0, 0, 127}));
   annotation(
     experiment(StopTime = 1.0),
     Documentation(info = "<html>

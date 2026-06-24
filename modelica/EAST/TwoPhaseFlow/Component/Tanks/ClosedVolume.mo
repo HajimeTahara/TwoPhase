@@ -6,12 +6,12 @@ model ClosedVolume
     annotation (choicesAllMatching=true);
 
   parameter Integer nPorts(min=1) = 2 "流体ポート数" annotation (Evaluate=true);
-  parameter Modelica.Units.SI.Volume V = 1.0 "容積 [m3]";
+  parameter Modelica.Units.SI.Volume V = 1.0 "容積";
   parameter Modelica.Units.SI.AbsolutePressure p_start = 1.0e5
-    "初期圧力 [Pa]";
+    "初期圧力";
   parameter Modelica.Units.SI.SpecificEnthalpy h_start =
     Medium.bubbleEnthalpy(Medium.setSat_p(p_start))
-    "初期比エンタルピー [J/kg]";
+    "初期比エンタルピー";
 
   EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_a ports[nPorts](
     redeclare each package Medium = Medium)

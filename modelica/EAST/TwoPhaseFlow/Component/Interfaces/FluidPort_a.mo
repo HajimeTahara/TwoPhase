@@ -1,6 +1,7 @@
 within EAST.TwoPhaseFlow.Component.Interfaces;
 
 connector FluidPort_a "流体入口ポート（上流側）"
+extends EAST.Icons.FluidPort_a;
   extends EAST.TwoPhaseFlow.Component.Interfaces.FluidPort;
   annotation(
     defaultComponentName = "port_a",

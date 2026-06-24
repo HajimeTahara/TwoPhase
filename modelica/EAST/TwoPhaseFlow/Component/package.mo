@@ -10,6 +10,7 @@ package Component "気液二相流コンポーネントライブラリ"
 <ul>
 <li><code>Interfaces</code>   — コネクタ定義 (<code>FluidPort</code>, <code>HeatPort</code>)</li>
 <li><code>Pipes</code>        — 管モデル群</li>
+<li><code>Pumps</code>        — ポンプモデル群</li>
 <li><code>Tanks</code>        — タンク・容器モデル群</li>
 <li><code>Valves</code>       — バルブモデル群</li>
 <li><code>Sources</code>      — 流体ソース・シンクモデル群</li>

@@ -22,16 +22,18 @@ OUTPUT_DIR = Path(__file__).parent.parent / "output"
 
 # (定数名, 型, dict キー, 説明)
 ENTRIES: list[tuple[str, str, str, str]] = [
-    ("MM_const",         "MolarMass",       "MM",               "モル質量 [kg/mol]"),
-    ("T_critical",       "Temperature",     "T_critical",       "臨界温度 [K]"),
-    ("p_critical",       "AbsolutePressure", "p_critical",       "臨界圧力 [Pa]"),
-    ("d_critical",       "Density",         "d_critical",       "臨界密度 [kg/m³]"),
-    ("T_triple",         "Temperature",     "T_triple",         "三重点温度 [K]"),
-    ("p_triple",         "AbsolutePressure", "p_triple",         "三重点圧力 [Pa]"),
-    ("T_normal_boiling", "Temperature",     "T_normal_boiling", "常圧沸点 [K] (101325 Pa)"),
+    ("MM_const",         "MolarMass",       "MM",               "モル質量"),
+    ("T_critical",       "Temperature",     "T_critical",       "臨界温度"),
+    ("p_critical",       "AbsolutePressure", "p_critical",       "臨界圧力"),
+    ("d_critical",       "Density",         "d_critical",       "臨界密度"),
+    ("T_triple",         "Temperature",     "T_triple",         "三重点温度"),
+    ("p_triple",         "AbsolutePressure", "p_triple",         "三重点圧力"),
+    ("T_normal_boiling", "Temperature",     "T_normal_boiling", "常圧沸点 (101325 Pa)"),
     ("omega_const",      "Real",            "omega",            "離心因子 (CoolProp acentric, PR EOS 用)"),
-    ("cp_liquid_const",  "SpecificHeatCapacity", "cp_liquid",    "飽和液の代表定圧比熱 [J/(kg·K)] (101325 Pa, specificEnthalpy_pT 用)"),
-    ("cp_vapor_const",   "SpecificHeatCapacity", "cp_vapor",     "飽和蒸気の代表定圧比熱 [J/(kg·K)] (101325 Pa, specificEnthalpy_pT 用)"),
+    ("cp_liquid_const",  "SpecificHeatCapacity", "cp_liquid",    "飽和液の代表定圧比熱 (101325 Pa, specificEnthalpy_pT 用)"),
+    ("cp_vapor_const",   "SpecificHeatCapacity", "cp_vapor",     "飽和蒸気の代表定圧比熱 (101325 Pa, specificEnthalpy_pT 用)"),
+    ("mu_const",         "ViscosityCoefficient", "mu_liquid",     "代表粘性係数 (101325 Pa, 飽和液)"),
+    ("lambda_const",     "ThermalConductivity", "lambda_liquid", "代表熱伝導率 (101325 Pa, 飽和液)"),
 ]
 
 

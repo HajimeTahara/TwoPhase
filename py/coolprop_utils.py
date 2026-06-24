@@ -22,7 +22,7 @@ PROPERTY_UNITS: dict[str, str] = {
     "S":       "J/(kg·K)",
     "C":       "J/(kg·K)",    # Cp
     "Cvmass":  "J/(kg·K)",    # Cv
-    "V":       "Pa·s",        # 動粘度
+    "V":       "Pa·s",        # 粘性係数
     "L":       "W/(m·K)",     # 熱伝導率
     "Q":       "-",           # クオリティ
 }
@@ -65,8 +65,9 @@ def get_fluid_constants(fluid: str, p_ref: float = 101325.0) -> dict[str, float]
 
     Peng-Robinson EOS（densitySinglePhase）が必要とする
     T_critical, p_critical, MM, omega に加え、
-    specificEnthalpy_pT の定積比熱近似に使う cp_liquid/cp_vapor を
-    基準圧力 p_ref [Pa] での飽和比熱として取得する。
+    specificEnthalpy_pT の定圧比熱近似に使う cp_liquid/cp_vapor と、
+    輸送物性の代表値に使う mu_liquid/lambda_liquid を
+    基準圧力 p_ref [Pa] の飽和物性として取得する。
     """
     sat_ref = get_saturation_properties_at_p(fluid, p_ref)
     return {
@@ -80,6 +81,8 @@ def get_fluid_constants(fluid: str, p_ref: float = 101325.0) -> dict[str, float]
         "omega":            PropsSI("acentric", fluid),
         "cp_liquid":        sat_ref["cp_l"],
         "cp_vapor":         sat_ref["cp_v"],
+        "mu_liquid":        sat_ref["mu_l"],
+        "lambda_liquid":    sat_ref["lambda_l"],
     }
 
 

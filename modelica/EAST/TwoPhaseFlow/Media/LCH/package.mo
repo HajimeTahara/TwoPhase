@@ -1,5 +1,6 @@
 within EAST.TwoPhaseFlow.Media;
 package LCH "液体メタン (CH₄) 媒体パッケージ"
+  extends Modelica.Icons.VariantsPackage;
   extends EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium(
     mediumName  = "Liquid Methane (CH4)",
     singleState = false);
@@ -7,16 +8,20 @@ package LCH "液体メタン (CH₄) 媒体パッケージ"
   // =====================================================================
   // 物質定数
   // =====================================================================
-  redeclare constant MolarMass        MM_const         = 0.016043 "モル質量 [kg/mol]";
-  redeclare constant Temperature      T_critical       = 190.564  "臨界温度 [K]";
-  redeclare constant AbsolutePressure p_critical       = 4.5992e6 "臨界圧力 [Pa]";
-  redeclare constant Density          d_critical       = 162.66   "臨界密度 [kg/m³]";
-  redeclare constant Temperature      T_triple         = 90.694   "三重点温度 [K]";
-  redeclare constant AbsolutePressure p_triple         = 11696.0  "三重点圧力 [Pa]";
-  redeclare constant Temperature      T_normal_boiling = 111.66   "常圧沸点 [K] (101325 Pa)";
+  redeclare constant MolarMass        MM_const         = 0.016043 "モル質量";
+  redeclare constant Temperature      T_critical       = 190.564  "臨界温度";
+  redeclare constant AbsolutePressure p_critical       = 4.5992e6 "臨界圧力";
+  redeclare constant Density          d_critical       = 162.66   "臨界密度";
+  redeclare constant Temperature      T_triple         = 90.694   "三重点温度";
+  redeclare constant AbsolutePressure p_triple         = 11696.0  "三重点圧力";
+  redeclare constant Temperature      T_normal_boiling = 111.66   "常圧沸点 (101325 Pa)";
   redeclare constant Real             omega_const      = 0.01142  "離心因子 (NIST WebBook)";
-  redeclare constant SpecificHeatCapacity cp_liquid_const = 3481.08 "飽和液の代表定圧比熱 [J/(kg·K)] (101325 Pa, CoolProp)";
-  redeclare constant SpecificHeatCapacity cp_vapor_const  = 2217.68 "飽和蒸気の代表定圧比熱 [J/(kg·K)] (101325 Pa, CoolProp)";
+  redeclare constant SpecificHeatCapacity cp_liquid_const = 3481.08 "飽和液の代表定圧比熱 (101325 Pa, CoolProp)";
+  redeclare constant SpecificHeatCapacity cp_vapor_const  = 2217.68 "飽和蒸気の代表定圧比熱 (101325 Pa, CoolProp)";
+  redeclare constant ViscosityCoefficient mu_const = 1.17e-4
+    "代表粘性係数 μ (101325 Pa, 飽和液メタンの代表値)";
+  redeclare constant ThermalConductivity lambda_const = 0.187
+    "代表熱伝導率 λ (101325 Pa, 飽和液メタンの代表値)";
 
   // =====================================================================
   // 飽和テーブル（CoolProp/Methane, 100 点, 対数圧力グリッド）
@@ -47,7 +52,7 @@ package LCH "液体メタン (CH₄) 媒体パッケージ"
     1970175.2, 2092414.6, 2222238.3, 2360117, 2506550.3,
     2662069.1, 2827237, 3002652.7, 3188952.2, 3386810.5,
     3596945, 3820117.2, 4057136.2, 4308861, 4576204}
-  "飽和圧力グリッド [Pa]";
+  "飽和圧力グリッド";
 
   redeclare constant Real sat_T[sat_n](each unit="K") =
   {
@@ -71,7 +76,7 @@ package LCH "液体メタン (CH₄) 媒体パッケージ"
     165.47407, 167.08089, 168.71493, 170.37647, 172.06572,
     173.78281, 175.52779, 177.30057, 179.10087, 180.92819,
     182.78164, 184.65981, 186.56034, 188.47895, 190.40471}
-  "飽和温度 [K]";
+  "飽和温度";
 
   redeclare constant Real sat_h_bubble[sat_n](each unit="J/kg") =
   {
@@ -95,7 +100,7 @@ package LCH "液体メタン (CH₄) 媒体パッケージ"
     209532.24, 217089.83, 224939.93, 233112, 241641.85,
     250573.99, 259965.07, 269889.45, 280448.53, 291787.67,
     304130, 317853.37, 333703.58, 353636.83, 391695.6}
-  "飽和液比エンタルピー [J/kg]";
+  "飽和液比エンタルピー";
 
   redeclare constant Real sat_h_dew[sat_n](each unit="J/kg") =
   {
@@ -119,7 +124,7 @@ package LCH "液体メタン (CH₄) 媒体パッケージ"
     555185.82, 554136.74, 552800.17, 551133.09, 549082.72,
     546582.99, 543549.41, 539870.68, 535394.87, 529904.54,
     523067.93, 514329.58, 502612.12, 485151.64, 442845.56}
-  "飽和蒸気比エンタルピー [J/kg]";
+  "飽和蒸気比エンタルピー";
 
   redeclare constant Real sat_d_bubble[sat_n](each unit="kg/m3") =
   {
@@ -143,7 +148,7 @@ package LCH "液体メタン (CH₄) 媒体パッケージ"
     322.87358, 318.63247, 314.15421, 309.40852, 304.35792,
     298.95523, 293.13951, 286.82973, 279.91418, 272.23119,
     263.53076, 253.38747, 240.95956, 224.04075, 187.03807}
-  "飽和液密度 [kg/m³]";
+  "飽和液密度";
 
   redeclare constant Real sat_d_dew[sat_n](each unit="kg/m3") =
   {
@@ -167,7 +172,7 @@ package LCH "液体メタン (CH₄) 媒体パッケージ"
     32.092034, 34.37608, 36.87319, 39.613986, 42.636289,
     45.98773, 49.729735, 53.943867, 58.742501, 64.288103,
     70.831439, 78.797884, 89.025375, 103.70489, 138.58183}
-  "飽和蒸気密度 [kg/m³]";
+  "飽和蒸気密度";
 
   annotation (Documentation(info="<html>
 <p>
@@ -181,10 +186,12 @@ package LCH "液体メタン (CH₄) 媒体パッケージ"
 <ul>
 <li>計算ロジック（密度・温度・乾き度・ボイド率・飽和物性補間）は
     <code>PartialTwoPhaseMedium</code> に実装済み</li>
-<li>このパッケージが提供するもの: 物質定数（<code>MM_const</code> 等）と飽和テーブル（<code>sat_p</code> 等）の値のみ</li>
+<li>このパッケージが提供するもの: 物質定数（<code>MM_const</code>,
+    <code>mu_const</code>, <code>lambda_const</code> 等）と飽和テーブル（<code>sat_p</code> 等）の値のみ</li>
 <li>単相域の密度（<code>densitySinglePhase</code>）は表引きではなく Peng-Robinson 状態方程式で計算する
     （<code>PartialTwoPhaseMedium</code> に実装済み）。このパッケージが追加で提供するのは
-    <code>T_critical</code>, <code>p_critical</code>, <code>omega_const</code>, <code>MM_const</code> の値のみ</li>
+    <code>T_critical</code>, <code>p_critical</code>, <code>omega_const</code>,
+    <code>MM_const</code>, <code>mu_const</code>, <code>lambda_const</code> の値のみ</li>
 </ul>
 <h4>物質定数</h4>
 <ul>

@@ -10,43 +10,43 @@ model GasPressuredTank
     "液相流体ポート数"
     annotation (Evaluate=true);
   parameter Modelica.Units.SI.Area crossArea = 1.0
-    "タンク断面積 [m2]";
+    "タンク断面積";
   parameter Modelica.Units.SI.Height height = 1.0
-    "タンク高さ [m]";
+    "タンク高さ";
   final parameter Modelica.Units.SI.Volume V_total = crossArea * height
-    "タンク全容積 [m3]";
+    "タンク全容積";
   parameter Modelica.Units.SI.Height portHeights[nPorts] = fill(0.0, nPorts)
-    "各液相ポートの高さ [m]（タンク底面から）";
+    "各液相ポートの高さ（タンク底面から）";
   parameter Modelica.Units.SI.Acceleration g = Modelica.Constants.g_n
-    "重力加速度 [m/s2]";
+    "重力加速度";
 
   parameter Modelica.Units.SI.AbsolutePressure p_gas_start = 1.0e5
-    "初期気相圧力 [Pa]";
+    "初期気相圧力";
   parameter Modelica.Units.SI.Temperature T_gas = 300.0
-    "気相温度 [K]（等温近似）";
+    "気相温度（等温近似）";
   parameter Modelica.Units.SI.MolarMass gasMolarMass = 0.0289652
-    "押しガスのモル質量 [kg/mol]（既定: 空気）";
+    "押しガスのモル質量（既定: 空気）";
   final parameter Real R_gas(unit="J/(kg.K)") =
     Modelica.Constants.R / gasMolarMass
-    "押しガスの比気体定数 [J/(kg.K)]";
+    "押しガスの比気体定数";
 
   parameter Modelica.Units.SI.Height level_start = 0.5 * height
-    "初期液位 [m]";
+    "初期液位";
   parameter Modelica.Units.SI.SpecificEnthalpy h_start =
     Medium.bubbleEnthalpy(Medium.setSat_p(p_gas_start))
-    "初期液相比エンタルピー [J/kg]";
+    "初期液相比エンタルピー";
   parameter Modelica.Units.SI.Density d_start =
     Medium.density(Medium.setState_ph(p_gas_start, h_start))
-    "初期液相密度 [kg/m3]";
+    "初期液相密度";
   final parameter Modelica.Units.SI.Volume V_liquid_start =
     crossArea * level_start
-    "初期液相体積 [m3]";
+    "初期液相体積";
   final parameter Modelica.Units.SI.Volume V_gas_start =
     max(V_total - V_liquid_start, 1.0e-9)
-    "初期気相体積 [m3]";
+    "初期気相体積";
   final parameter Modelica.Units.SI.Mass M_gas_start =
     p_gas_start * V_gas_start / (R_gas * T_gas)
-    "初期気相質量 [kg]";
+    "初期気相質量";
 
   Modelica.Blocks.Interfaces.RealInput mGas_flow_in(unit="kg/s")
     "押しガス質量流量入力 [kg/s]（正: タンク気相へ流入）"

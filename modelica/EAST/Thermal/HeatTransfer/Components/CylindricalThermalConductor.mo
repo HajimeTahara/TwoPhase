@@ -3,22 +3,22 @@ within EAST.Thermal.HeatTransfer.Components;
 model CylindricalThermalConductor "材料物性と多層円筒形状から半径方向熱伝導を計算する要素"
   parameter Integer nLayers(min = 1) = 1 "層数" annotation(
     Evaluate = true);
-  parameter Modelica.Units.SI.Diameter innerDiameter = 0.02 "最内層の内径 [m]";
-  parameter Modelica.Units.SI.Diameter outerDiameter[nLayers] = {innerDiameter + 0.02*i for i in 1:nLayers} "各層の外径 [m]";
-  parameter Modelica.Units.SI.Length L = 0.1 "円筒長さ [m]";
+  parameter Modelica.Units.SI.Diameter innerDiameter = 0.02 "最内層の内径";
+  parameter Modelica.Units.SI.Diameter outerDiameter[nLayers] = {innerDiameter + 0.02*i for i in 1:nLayers} "各層の外径";
+  parameter Modelica.Units.SI.Length L = 0.1 "円筒長さ";
   parameter EAST.Thermal.Material.MaterialProperties material[nLayers] = fill(EAST.Thermal.Material.Sus304(), nLayers) "各層の材料物性";
   parameter Boolean use_heat_input = false "true の場合、各層の発熱量を外部入力から与える" annotation(
     Evaluate = true);
-  parameter Modelica.Units.SI.HeatFlowRate Q_gen[nLayers] = fill(0, nLayers) "各層の固定内部発熱量 [W]（正: 加熱）";
-  parameter Modelica.Units.SI.Temperature T_start[nLayers] = fill(293.15, nLayers) "各層の初期温度 [K]";
+  parameter Modelica.Units.SI.HeatFlowRate Q_gen[nLayers] = fill(0, nLayers) "各層の固定内部発熱量（正: 加熱）";
+  parameter Modelica.Units.SI.Temperature T_start[nLayers] = fill(293.15, nLayers) "各層の初期温度";
   final parameter Integer nInterfaces = max(nLayers - 1, 0) "隣接層間インターフェース数";
-  final parameter Modelica.Units.SI.Length r_inner[nLayers] = {if i == 1 then innerDiameter/2 else outerDiameter[i - 1]/2 for i in 1:nLayers} "各層の内半径 [m]";
-  final parameter Modelica.Units.SI.Length r_outer[nLayers] = {outerDiameter[i]/2 for i in 1:nLayers} "各層の外半径 [m]";
-  final parameter Modelica.Units.SI.Length r_middle[nLayers] = {Modelica.Math.sqrt(r_inner[i]*r_outer[i]) for i in 1:nLayers} "各層の熱容量代表半径 [m]";
-  final parameter Modelica.Units.SI.Volume V[nLayers] = {Modelica.Constants.pi*L*(r_outer[i]^2 - r_inner[i]^2) for i in 1:nLayers} "各層の体積 [m3]";
-  final parameter Modelica.Units.SI.ThermalConductance G_innerHalf[nLayers] = {2*Modelica.Constants.pi*material[i].thermalConductivity*L/Modelica.Math.log(r_middle[i]/r_inner[i]) for i in 1:nLayers} "各層内側半分の熱コンダクタンス [W/K]";
-  final parameter Modelica.Units.SI.ThermalConductance G_outerHalf[nLayers] = {2*Modelica.Constants.pi*material[i].thermalConductivity*L/Modelica.Math.log(r_outer[i]/r_middle[i]) for i in 1:nLayers} "各層外側半分の熱コンダクタンス [W/K]";
-  final parameter Modelica.Units.SI.ThermalConductance G_between[nInterfaces] = {1/(1/G_outerHalf[i] + 1/G_innerHalf[i + 1]) for i in 1:nInterfaces} "隣接層間の等価熱コンダクタンス [W/K]";
+  final parameter Modelica.Units.SI.Length r_inner[nLayers] = {if i == 1 then innerDiameter/2 else outerDiameter[i - 1]/2 for i in 1:nLayers} "各層の内半径";
+  final parameter Modelica.Units.SI.Length r_outer[nLayers] = {outerDiameter[i]/2 for i in 1:nLayers} "各層の外半径";
+  final parameter Modelica.Units.SI.Length r_middle[nLayers] = {Modelica.Math.sqrt(r_inner[i]*r_outer[i]) for i in 1:nLayers} "各層の熱容量代表半径";
+  final parameter Modelica.Units.SI.Volume V[nLayers] = {Modelica.Constants.pi*L*(r_outer[i]^2 - r_inner[i]^2) for i in 1:nLayers} "各層の体積";
+  final parameter Modelica.Units.SI.ThermalConductance G_innerHalf[nLayers] = {2*Modelica.Constants.pi*material[i].thermalConductivity*L/Modelica.Math.log(r_middle[i]/r_inner[i]) for i in 1:nLayers} "各層内側半分の熱コンダクタンス";
+  final parameter Modelica.Units.SI.ThermalConductance G_outerHalf[nLayers] = {2*Modelica.Constants.pi*material[i].thermalConductivity*L/Modelica.Math.log(r_outer[i]/r_middle[i]) for i in 1:nLayers} "各層外側半分の熱コンダクタンス";
+  final parameter Modelica.Units.SI.ThermalConductance G_between[nInterfaces] = {1/(1/G_outerHalf[i] + 1/G_innerHalf[i + 1]) for i in 1:nInterfaces} "隣接層間の等価熱コンダクタンス";
   Modelica.Units.SI.Temperature T[nLayers] "各層の代表温度 [K]";
   Modelica.Units.SI.HeatFlowRate Q_between[nInterfaces] "層 i から i+1 へ流れる熱流量 [W]";
   EAST.Thermal.HeatTransfer.Components.HeatCapacitor layer[nLayers](V = V, material = material, T_start = T_start) "各層の集中熱容量";

@@ -1,11 +1,11 @@
 within EAST.Thermal.HeatTransfer.Components;
 
 model HeatCapacitor "体積と材料物性から熱容量を計算する集中熱容量"
-  parameter Modelica.Units.SI.Volume V = 1e-6 "体積 [m3]";
+  parameter Modelica.Units.SI.Volume V = 1e-6 "体積";
   parameter EAST.Thermal.Material.MaterialProperties material = EAST.Thermal.Material.Sus304() "材料物性";
-  parameter Modelica.Units.SI.Temperature T_start = 293.15 "初期温度 [K]";
-  final parameter Modelica.Units.SI.Mass m = material.density*V "質量 [kg]";
-  final parameter Modelica.Units.SI.HeatCapacity C = m*material.specificHeatCapacity "熱容量 [J/K]";
+  parameter Modelica.Units.SI.Temperature T_start = 293.15 "初期温度";
+  final parameter Modelica.Units.SI.Mass m = material.density*V "質量";
+  final parameter Modelica.Units.SI.HeatCapacity C = m*material.specificHeatCapacity "熱容量";
   Modelica.Units.SI.Temperature T(start = T_start) "温度 [K]";
   EAST.Thermal.HeatTransfer.Interfaces.HeatPort_a port_top "上側熱ポート" annotation(
     Placement(transformation(extent = {{-10, 90}, {10, 110}}), iconTransformation(extent = {{-10, 90}, {10, 110}})));

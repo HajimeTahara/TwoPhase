@@ -1,10 +1,10 @@
 within EAST.Thermal.HeatTransfer.Components;
 
 model ThermalConductor "材料物性と形状から熱コンダクタンスを計算する熱伝導要素"
-  parameter Modelica.Units.SI.Area A = 1e-4 "伝熱面積 [m2]";
-  parameter Modelica.Units.SI.Length L = 1e-3 "伝熱長さ [m]";
+  parameter Modelica.Units.SI.Area A = 1e-4 "伝熱面積";
+  parameter Modelica.Units.SI.Length L = 1e-3 "伝熱長さ";
   parameter EAST.Thermal.Material.MaterialProperties material = EAST.Thermal.Material.Sus304() "材料物性";
-  final parameter Modelica.Units.SI.ThermalConductance G = material.thermalConductivity*A/L "熱コンダクタンス [W/K]";
+  final parameter Modelica.Units.SI.ThermalConductance G = material.thermalConductivity*A/L "熱コンダクタンス";
   EAST.Thermal.HeatTransfer.Interfaces.HeatPort_a port_a "熱ポート a" annotation(
     Placement(transformation(extent = {{-110, -10}, {-90, 10}}), iconTransformation(extent = {{-110, -10}, {-90, 10}})));
   EAST.Thermal.HeatTransfer.Interfaces.HeatPort_b port_b "熱ポート b" annotation(

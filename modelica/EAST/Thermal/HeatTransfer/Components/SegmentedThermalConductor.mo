@@ -3,25 +3,25 @@ model SegmentedThermalConductor
   "長さ方向の熱容量分布で時間応答遅れを表現する熱伝導要素"
   parameter Integer nSegments(min=1) = 5
     "長さ方向の分割数" annotation (Evaluate=true);
-  parameter Modelica.Units.SI.Area A = 1e-4 "伝熱面積 [m2]";
-  parameter Modelica.Units.SI.Length L = 0.1 "伝熱長さ [m]";
+  parameter Modelica.Units.SI.Area A = 1e-4 "伝熱面積";
+  parameter Modelica.Units.SI.Length L = 0.1 "伝熱長さ";
   parameter EAST.Thermal.Material.MaterialProperties material =
     EAST.Thermal.Material.Sus304() "材料物性";
   parameter Modelica.Units.SI.Temperature T_start[nSegments] =
-    fill(293.15, nSegments) "各セグメントの初期温度 [K]";
+    fill(293.15, nSegments) "各セグメントの初期温度";
 
   final parameter Integer nInterfaces = max(nSegments - 1, 0)
     "隣接セグメント間インターフェース数";
   final parameter Modelica.Units.SI.Length dx = L / nSegments
-    "1 セグメントあたりの長さ [m]";
+    "1 セグメントあたりの長さ";
   final parameter Modelica.Units.SI.Volume V_segment = A * dx
-    "1 セグメントあたりの体積 [m3]";
+    "1 セグメントあたりの体積";
   final parameter Modelica.Units.SI.ThermalConductance G_boundary =
     2 * material.thermalConductivity * A / dx
-    "端面から端部セグメント中心までの熱コンダクタンス [W/K]";
+    "端面から端部セグメント中心までの熱コンダクタンス";
   final parameter Modelica.Units.SI.ThermalConductance G_between =
     material.thermalConductivity * A / dx
-    "隣接セグメント中心間の熱コンダクタンス [W/K]";
+    "隣接セグメント中心間の熱コンダクタンス";
 
   Modelica.Units.SI.Temperature T[nSegments]
     "各セグメントの代表温度 [K]";

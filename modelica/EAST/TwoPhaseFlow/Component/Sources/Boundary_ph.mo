@@ -1,7 +1,7 @@
 within EAST.TwoPhaseFlow.Component.Sources;
 model Boundary_ph
   "固定圧力・固定比エンタルピー 境界（無限大リザーバー）"
-
+  extends EAST.Icons.SourceBoundary;
   replaceable package Medium = EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium
     annotation (choicesAllMatching=true);
 
@@ -12,10 +12,10 @@ model Boundary_ph
     "true の場合、比エンタルピーを入力コネクタ h_in から与える"
     annotation(Evaluate=true, HideResult=true, choices(checkBox=true));
   parameter Modelica.Units.SI.AbsolutePressure  p_set = 1.0e5
-    "固定圧力 [Pa]"
+    "固定圧力"
     annotation (Dialog(enable = not use_p_in));
   parameter Modelica.Units.SI.SpecificEnthalpy  h_set = 4.0e5
-    "流出流体の比エンタルピー [J/kg]"
+    "流出流体の比エンタルピー"
     annotation (Dialog(enable = not use_h_in));
 
   Modelica.Blocks.Interfaces.RealInput p_in(unit="Pa") if use_p_in
@@ -51,20 +51,7 @@ equation
   port.h_outflow = h_in_internal;
 
   annotation (
-    Icon(coordinateSystem(preserveAspectRatio=false), graphics={
-      Rectangle(
-        extent={{-80,60},{80,-60}},
-        lineColor={0,127,255},
-        fillColor={170,213,255},
-        fillPattern=FillPattern.Solid),
-      Text(
-        extent={{-70,30},{70,-30}},
-        lineColor={0,0,255},
-        textString="p,h"),
-      Text(
-        extent={{-100,80},{100,62}},
-        lineColor={0,0,0},
-        textString="%name")}),
+    Icon(coordinateSystem(preserveAspectRatio = false)),
     Documentation(info="<html>
 <p>
 圧力 <code>p_set</code> と比エンタルピー <code>h_set</code> を固定する境界条件モデル。
@@ -74,6 +61,11 @@ equation
 <code>use_p_in</code> または <code>use_h_in</code> を <code>true</code> にすると、
 対応する値を外部入力コネクタから与えることができる。
 </p>
+<h4>入力コネクタの単位系</h4>
+<ul>
+<li><code>p_in</code> — 圧力 [Pa]（絶対圧力）</li>
+<li><code>h_in</code> — 比エンタルピー [J/kg]</li>
+</ul>
 <p>
 MSL の <code>Modelica.Fluid.Sources.Boundary_ph</code> に相当する。
 <code>port</code>（<code>FluidPort_b</code>型）を下流コンポーネントの

@@ -10,24 +10,28 @@ partial package PartialTwoPhaseMedium
     "= true のとき密度・内部エネルギーが圧力に依存しない";
 
   // 具体的流体が提供する抽象定数（値なし; extends 時に具体値を与える）
-  replaceable constant MolarMass MM_const                           "モル質量 [kg/mol]";
-  replaceable constant Temperature      T_critical                  "臨界温度 [K]";
-  replaceable constant AbsolutePressure p_critical                  "臨界圧力 [Pa]";
-  replaceable constant Density          d_critical                  "臨界密度 [kg/m³]";
-  replaceable constant Temperature      T_triple                    "三重点温度 [K]";
-  replaceable constant AbsolutePressure p_triple                    "三重点圧力 [Pa]";
-  replaceable constant Temperature      T_normal_boiling             "常圧沸点 [K] (101325 Pa)";
+  replaceable constant MolarMass MM_const                           "モル質量";
+  replaceable constant Temperature      T_critical                  "臨界温度";
+  replaceable constant AbsolutePressure p_critical                  "臨界圧力";
+  replaceable constant Density          d_critical                  "臨界密度";
+  replaceable constant Temperature      T_triple                    "三重点温度";
+  replaceable constant AbsolutePressure p_triple                    "三重点圧力";
+  replaceable constant Temperature      T_normal_boiling             "常圧沸点 (101325 Pa)";
   replaceable constant Real             omega_const                  "離心因子 (Pitzer acentric factor, PR EOS 用)";
-  replaceable constant SpecificHeatCapacity cp_liquid_const            "飽和液の代表定圧比熱 [J/(kg·K)]（specificEnthalpy_pT 近似用）";
-  replaceable constant SpecificHeatCapacity cp_vapor_const             "飽和蒸気の代表定圧比熱 [J/(kg·K)]（specificEnthalpy_pT 近似用）";
+  replaceable constant SpecificHeatCapacity cp_liquid_const            "飽和液の代表定圧比熱（specificEnthalpy_pT 近似用）";
+  replaceable constant SpecificHeatCapacity cp_vapor_const             "飽和蒸気の代表定圧比熱（specificEnthalpy_pT 近似用）";
+  replaceable constant ViscosityCoefficient mu_const
+    "代表粘性係数 μ（固定値）";
+  replaceable constant ThermalConductivity lambda_const
+    "代表熱伝導率 λ（固定値）";
 
   replaceable constant Integer   sat_n                                   "飽和テーブル点数";
-  replaceable constant Real      sat_p[sat_n]        (each unit="Pa")    "飽和圧力グリッド [Pa]";
-  replaceable constant Real      sat_T[sat_n]        (each unit="K")     "飽和温度 [K]";
-  replaceable constant Real      sat_h_bubble[sat_n] (each unit="J/kg")  "飽和液比エンタルピー [J/kg]";
-  replaceable constant Real      sat_h_dew[sat_n]    (each unit="J/kg")  "飽和蒸気比エンタルピー [J/kg]";
-  replaceable constant Real      sat_d_bubble[sat_n] (each unit="kg/m3") "飽和液密度 [kg/m³]";
-  replaceable constant Real      sat_d_dew[sat_n]    (each unit="kg/m3") "飽和蒸気密度 [kg/m³]";
+  replaceable constant Real      sat_p[sat_n]        (each unit="Pa")    "飽和圧力グリッド";
+  replaceable constant Real      sat_T[sat_n]        (each unit="K")     "飽和温度";
+  replaceable constant Real      sat_h_bubble[sat_n] (each unit="J/kg")  "飽和液比エンタルピー";
+  replaceable constant Real      sat_h_dew[sat_n]    (each unit="J/kg")  "飽和蒸気比エンタルピー";
+  replaceable constant Real      sat_d_bubble[sat_n] (each unit="kg/m3") "飽和液密度";
+  replaceable constant Real      sat_d_dew[sat_n]    (each unit="kg/m3") "飽和蒸気密度";
 
   // =====================================================================
   // 型エイリアス
@@ -39,7 +43,10 @@ partial package PartialTwoPhaseMedium
   type SpecificInternalEnergy = Modelica.Units.SI.SpecificInternalEnergy;
   type SpecificHeatCapacity   = Modelica.Units.SI.SpecificHeatCapacity;
   type MolarMass              = Modelica.Units.SI.MolarMass;
-  type DynamicViscosity       = Modelica.Units.SI.DynamicViscosity;
+  type ViscosityCoefficient   = Modelica.Units.SI.DynamicViscosity
+    "粘性係数 μ [Pa·s]";
+  type KinematicViscosityCoefficient = Modelica.Units.SI.KinematicViscosity
+    "動粘性係数 ν [m²/s]";
   type ThermalConductivity    = Modelica.Units.SI.ThermalConductivity;
 
   // =====================================================================
@@ -87,6 +94,10 @@ partial package PartialTwoPhaseMedium
     SpecificInternalEnergy u   "比内部エネルギー [J/kg]";
     SpecificHeatCapacity   R_s "比気体定数 [J/(kg·K)]";
     MolarMass              MM  "モル質量 [kg/mol]";
+    ViscosityCoefficient   mu  "代表粘性係数 μ [Pa·s]";
+    KinematicViscosityCoefficient nu "動粘性係数 ν = μ/d [m²/s]";
+    SpecificHeatCapacity   cp  "代表定圧比熱";
+    ThermalConductivity    lambda "代表熱伝導率";
 
     Integer phase(min=0, max=2, start=1)
       "相状態: 1 = 単相, 2 = 二相, 0 = 不明";
@@ -104,6 +115,10 @@ partial package PartialTwoPhaseMedium
     T     = temperature(state);
     phase = phaseOf(state);
     MM    = molarMass(state);
+    mu    = mu_const;
+    nu    = mu/d;
+    cp    = cp_liquid_const;
+    lambda = lambda_const;
     // 普遍的熱力学恒等式
     u   = h - p / d;
     R_s = Modelica.Constants.R / MM;
@@ -428,7 +443,8 @@ partial package PartialTwoPhaseMedium
     <code>MM_const</code>, <code>sat_n</code>, <code>sat_p</code>, <code>sat_T</code>,
     <code>sat_h_bubble</code>, <code>sat_h_dew</code>, <code>sat_d_bubble</code>, <code>sat_d_dew</code>,
     <code>T_critical</code>, <code>p_critical</code>, <code>omega_const</code>,
-    <code>cp_liquid_const</code>, <code>cp_vapor_const</code></li>
+    <code>cp_liquid_const</code>, <code>cp_vapor_const</code>,
+    <code>mu_const</code>, <code>lambda_const</code></li>
 <li>単相域の密度（<code>densitySinglePhase</code>）は表引きではなく
     Peng-Robinson (PR) 状態方程式で計算する（後述）</li>
 </ul>
@@ -483,9 +499,11 @@ Z³ - (1-B)·Z² + (A - 3B² - 2B)·Z - (AB - B² - B³) = 0
 <tr><td><code>p_critical</code></td><td>臨界圧力 pc [Pa]</td></tr>
 <tr><td><code>omega_const</code></td><td>離心因子 ω (Pitzer acentric factor)</td></tr>
 <tr><td><code>MM_const</code></td><td>モル質量 [kg/mol]</td></tr>
+<tr><td><code>mu_const</code></td><td>代表粘性係数 μ [Pa&middot;s]（固定値）</td></tr>
+<tr><td><code>lambda_const</code></td><td>代表熱伝導率 λ [W/(m&middot;K)]（固定値）</td></tr>
 </table>
 <p>
-4 つすべて CoolProp から取得できる（<code>python/coolprop_utils.py</code> の
+これらは CoolProp から取得できる（<code>py/coolprop_utils.py</code> の
 <code>get_fluid_constants</code>、生成スクリプトは <code>python/methane/constants.py</code>）。
 </p>
 

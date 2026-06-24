@@ -10,7 +10,6 @@ Adaptor
 MultiPort
 ClosedVolume
 OpenTank
-Source
 MassFlowSource
 SensorOnePort
 Thermometer
@@ -30,3 +29,5 @@ Convection
 BodyRadiation
 TemperatureSensor
 HeatFlowSensor
+SourceBoundary
+GeneralValve

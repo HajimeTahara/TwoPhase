@@ -10,23 +10,23 @@ model OpenTank
     "流体ポート数"
     annotation (Evaluate=true);
   parameter Modelica.Units.SI.Area crossArea = 1.0
-    "タンク断面積 [m2]";
+    "タンク断面積";
   parameter Modelica.Units.SI.Height height = 1.0
-    "タンク高さ [m]";
+    "タンク高さ";
   parameter Modelica.Units.SI.Height portHeights[nPorts] = fill(0.0, nPorts)
-    "各ポートの高さ [m]（タンク底面から）";
+    "各ポートの高さ（タンク底面から）";
   parameter Modelica.Units.SI.AbsolutePressure p_ambient = 1.0e5
-    "自由表面圧力 [Pa]";
+    "自由表面圧力";
   parameter Modelica.Units.SI.Acceleration g = Modelica.Constants.g_n
-    "重力加速度 [m/s2]";
+    "重力加速度";
   parameter Modelica.Units.SI.Height level_start = 0.5 * height
-    "初期液位 [m]";
+    "初期液位";
   parameter Modelica.Units.SI.SpecificEnthalpy h_start =
     Medium.bubbleEnthalpy(Medium.setSat_p(p_ambient))
-    "初期比エンタルピー [J/kg]";
+    "初期比エンタルピー";
   parameter Modelica.Units.SI.Density d_start =
     Medium.density(Medium.setState_ph(p_ambient, h_start))
-    "初期密度 [kg/m3]";
+    "初期密度";
 
   EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_a ports[nPorts](
     redeclare each package Medium = Medium)

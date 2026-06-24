@@ -7,8 +7,8 @@ partial model Source
           fillPattern=FillPattern.Sphere,
           fillColor={0,127,255}),
         Text(
-          extent={{-150,110},{150,150}},
-          textColor={0,0,255},
+          origin = {-10, -250},
+          textColor={0,0,255},extent={{-150,110},{150,150}},
           textString="%name")}), Documentation(info="<html>
 <p>
 MSL <code>Modelica.Fluid.Sources.FixedBoundary</code>（固定境界条件ソース）の

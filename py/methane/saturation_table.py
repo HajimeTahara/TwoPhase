@@ -78,12 +78,12 @@ def generate_modelica_snippet(table: dict[str, np.ndarray]) -> str:
     )
 
     entries = [
-        ("sat_p",        "Pa",    "飽和圧力グリッド [Pa]",         "p"),
-        ("sat_T",        "K",     "飽和温度 [K]",                   "T_sat"),
-        ("sat_h_bubble", "J/kg",  "飽和液比エンタルピー [J/kg]",    "h_bubble"),
-        ("sat_h_dew",    "J/kg",  "飽和蒸気比エンタルピー [J/kg]",  "h_dew"),
-        ("sat_d_bubble", "kg/m3", "飽和液密度 [kg/m³]",             "d_bubble"),
-        ("sat_d_dew",    "kg/m3", "飽和蒸気密度 [kg/m³]",           "d_dew"),
+        ("sat_p",        "Pa",    "飽和圧力グリッド",       "p"),
+        ("sat_T",        "K",     "飽和温度",               "T_sat"),
+        ("sat_h_bubble", "J/kg",  "飽和液比エンタルピー",   "h_bubble"),
+        ("sat_h_dew",    "J/kg",  "飽和蒸気比エンタルピー", "h_dew"),
+        ("sat_d_bubble", "kg/m3", "飽和液密度",             "d_bubble"),
+        ("sat_d_dew",    "kg/m3", "飽和蒸気密度",           "d_dew"),
     ]
 
     decls: list[str] = [meta]

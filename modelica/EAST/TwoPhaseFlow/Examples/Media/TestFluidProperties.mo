@@ -1,11 +1,11 @@
 within EAST.TwoPhaseFlow.Examples.Media;
 
 model TestFluidProperties "LCH 流体の BaseProperties 使用例"
-extends Modelica.Icons.Example;
-  package Medium = EAST.TwoPhaseFlow.Media.LCH;
-  parameter Modelica.Units.SI.SpecificEnthalpy h_start = 0 "開始時の比エンタルピー [J/kg]";
-  parameter Modelica.Units.SI.SpecificEnthalpy h_end = 600000 "終了時の比エンタルピー [J/kg]";
-  parameter Modelica.Units.SI.Time rampDuration(min = Modelica.Constants.eps) = 100.0 "比エンタルピーを線形変化させる時間 [s]";
+  extends Modelica.Icons.Example;
+  replaceable package Medium = EAST.TwoPhaseFlow.Media.LCH;
+  parameter Modelica.Units.SI.SpecificEnthalpy h_start = 0 "開始時の比エンタルピー";
+  parameter Modelica.Units.SI.SpecificEnthalpy h_end = 600000 "終了時の比エンタルピー";
+  parameter Modelica.Units.SI.Time rampDuration(min = Modelica.Constants.eps) = 100.0 "比エンタルピーを線形変化させる時間";
   Medium.BaseProperties props(preferredMediumStates = true);
   Real alpha "ボイド率";
 equation

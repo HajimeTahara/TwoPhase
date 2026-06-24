@@ -15,7 +15,7 @@ OpenModelica Standard Library (MSL) の <code>Modelica.Media</code> /
 <h4>パッケージ構成</h4>
 <ul>
 <li><b>Media</b>     — 熱物性パッケージ（基底クラス・具体的流体）</li>
-<li><b>Component</b> — 流体コンポーネント（管・タンク・バルブ・ソース）</li>
+<li><b>Component</b> — 流体コンポーネント（管・ポンプ・タンク・バルブ・ソース）</li>
 <li><b>Examples</b>  — 使用例</li>
 </ul>
 </html>"),
