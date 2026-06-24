@@ -1,22 +1,9 @@
 within EAST.Icons;
-partial model TwoPortFlowDevice
-  "MSL Modelica.Fluid.Interfaces.PartialTwoPort の二方ポート流体デバイスアイコン"
-  annotation (Icon(coordinateSystem(preserveAspectRatio=true, extent={{-100,-100},{100,100}}), graphics={
-        Polygon(
-          points={{20,-70},{60,-85},{20,-100},{20,-70}},
-          lineColor={0,128,255},
-          fillColor={0,128,255},
-          fillPattern=FillPattern.Solid),
-        Polygon(
-          points={{20,-75},{50,-85},{20,-95},{20,-75}},
-          lineColor={255,255,255},
-          fillColor={255,255,255},
-          fillPattern=FillPattern.Solid),
-        Line(points={{55,-85},{-60,-85}}, color={0,128,255}),
-        Text(
-          extent={{-149,-114},{151,-154}},
-          textColor={0,0,255},
-          textString="%name")}), Documentation(info="<html>
+
+partial model TwoPortFlowDevice "MSL Modelica.Fluid.Interfaces.PartialTwoPort の二方ポート流体デバイスアイコン"
+  annotation(
+    Icon(coordinateSystem(preserveAspectRatio = true, extent = {{-100, -100}, {100, 100}}), graphics = {Polygon(lineColor = {0, 128, 255}, fillColor = {0, 128, 255}, fillPattern = FillPattern.Solid, points = {{20, -70}, {60, -85}, {20, -100}, {20, -70}}), Polygon(lineColor = {255, 255, 255}, fillColor = {255, 255, 255}, fillPattern = FillPattern.Solid, points = {{20, -75}, {50, -85}, {20, -95}, {20, -75}}), Line(points = {{55, -85}, {-60, -85}}, color = {0, 128, 255}), Text(origin = {0, 14}, textColor = {0, 0, 255}, extent = {{-139, -114}, {141, -154}}, textString = "%name")}),
+    Documentation(info = "<html>
 <p>
 MSL <code>Modelica.Fluid.Interfaces.PartialTwoPort</code> が提供する、
 二方ポート流体デバイス共通の意匠（設計流れ方向の矢印 + インスタンス名ラベル）を

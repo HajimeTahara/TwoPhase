@@ -1,6 +1,7 @@
 within EAST.TwoPhaseFlow.Component.Pipes;
 
 model DynamicPipe "動的管モデル（N 分割 CV チェーンで流体の移流を近似; セグメントごとの HeatPort を公開）"
+  extends EAST.Icons.DynamicPipe;
   replaceable package Medium = EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium annotation(
     choicesAllMatching = true);
   // ジオメトリ（断面形状は全セグメント共通、長さ方向だけ nNodes 分割）
@@ -109,7 +110,7 @@ equation
     end for;
   end if;
   annotation(
-    Icon(coordinateSystem(preserveAspectRatio = false), graphics = {Text(origin = {0, -233}, extent = {{-100, 133}, {100, 93}}, textString = "%name"), Rectangle(fillColor = {0, 127, 255}, fillPattern = FillPattern.HorizontalCylinder, extent = {{-100, 44}, {100, -44}})}),
+    Icon(coordinateSystem(preserveAspectRatio = false), graphics = {Text(origin = {0, -233}, extent = {{-100, 133}, {100, 93}}, textString = "%name")}),
     Documentation(info = "<html>
 <p>
 動的単相・二相管モデル。選択した断面形状から求める流路断面積

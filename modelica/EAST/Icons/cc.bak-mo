@@ -1,0 +1,20 @@
+within EAST.Icons;
+
+model cc
+  annotation (
+    Icon(
+      coordinateSystem(preserveAspectRatio=true),
+      graphics={
+        Rectangle(
+          extent={{-100,44},{100,-44}},
+          fillColor={0,127,255},
+          fillPattern=FillPattern.HorizontalCylinder),
+        Rectangle(
+          extent={{-44,100},{44,44}},
+          fillColor={0,127,255},
+          fillPattern=FillPattern.VerticalCylinder),
+        Text(
+          extent={{-100,-55},{100,-85}},
+          textColor={0,0,255},
+          textString="%name")}));
+end cc;

@@ -125,7 +125,7 @@ equation
 第 2 列には揚程を昇順で設定する。範囲内は線形補間し、
 範囲外では端点の値を保持する。
 </p>
-<table border="1" cellspacing="0" cellpadding="4">
+<table border='1' cellspacing='0' cellpadding='4'>
 <tr><th>列</th><th>物理量</th><th>単位</th></tr>
 <tr><td>第1列</td><td>定格回転数における体積流量 Q</td><td>m&sup3;/s</td></tr>
 <tr><td>第2列</td><td>定格回転数における揚程 H</td><td>m</td></tr>

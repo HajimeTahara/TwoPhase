@@ -1,6 +1,7 @@
 within EAST.TwoPhaseFlow.Component.Pipes;
 
 model DynamicPipeSegment "動的管セグメント（単一 well-mixed 制御容積; DynamicPipe の内部要素）"
+  extends EAST.Icons.DynamicPipe;
   replaceable package Medium = EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium annotation(
     choicesAllMatching = true);
   parameter PipeGeometry geometry = PipeGeometry.Circular "配管断面形状" annotation(
@@ -138,7 +139,7 @@ equation
     Q_flow = 0;
   end if;
   annotation(
-    Icon(coordinateSystem(preserveAspectRatio = false), graphics = {Text(origin = {0, -233}, textColor = {0, 0, 255},extent = {{-100, 133}, {100, 93}}, textString = "%name"), Rectangle(fillColor = {0, 127, 255}, fillPattern = FillPattern.HorizontalCylinder, extent = {{-100, 44}, {100, -44}})}),
+    Icon(coordinateSystem(preserveAspectRatio = false), graphics = {Text(origin = {0, -233}, textColor = {0, 0, 255}, extent = {{-100, 133}, {100, 93}}, textString = "%name")}),
     Documentation(info = "<html>
 <p>
 <code>DynamicPipe</code> の内部要素として使う、単一 well-mixed 制御容積（CV）モデル。

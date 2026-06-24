@@ -8,6 +8,7 @@ package Pipes "管モデル群"
 <li><code>PipeGeometry</code> — 矩形管、円管、中空円環を選択する断面形状の列挙型</li>
 <li><code>FrictionCorrelation</code> — 乱流域の Blasius / Colebrook-White 相関式を選択する列挙型</li>
 <li><code>pipeNusseltNumber</code> — 管内強制対流の Reynolds 数・Prandtl 数から Nusselt 数を計算する関数</li>
+<li><code>StaticPipe</code> — 制御容積と流体蓄積を持たず、管摩擦圧力損失だけを計算する静的管抵抗</li>
 <li><code>DynamicPipe</code> — 動的管（<code>nNodes</code> 個の <code>DynamicPipeSegment</code> を直列接続し、
     管内流体の移流を近似; <code>use_HeatTransfer</code> によりセグメントごとの HeatPort を切替可能）</li>
 <li><code>DynamicPipeSegment</code> — 単一 well-mixed 制御容積（<code>DynamicPipe</code> の内部要素;

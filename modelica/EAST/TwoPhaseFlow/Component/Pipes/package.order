@@ -2,5 +2,6 @@ PipeGeometry
 FrictionCorrelation
 colebrookFrictionFactor
 pipeNusseltNumber
+StaticPipe
 DynamicPipeSegment
 DynamicPipe

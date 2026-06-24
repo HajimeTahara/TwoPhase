@@ -1,6 +1,5 @@
 FluidPackage
 TwoPortFlowDevice
-Pipe
 Pump
 SweptVolume
 Valve
@@ -31,3 +30,6 @@ TemperatureSensor
 HeatFlowSensor
 SourceBoundary
 GeneralValve
+TeeJunction
+DynamicPipe
+StaticPipe
