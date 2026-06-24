@@ -1,6 +1,7 @@
 within EAST.TwoPhaseFlow.Examples.Pipes;
 
 model TestPipeWithSource "LCH 加熱管：過冷却液入口 → 二相出口の例題"
+extends Modelica.Icons.Example;
   // LCH（液体メタン）を媒体として選択
   package Medium = EAST.TwoPhaseFlow.Media.LCH;
   // -----------------------------------------------------------------
@@ -14,7 +15,7 @@ model TestPipeWithSource "LCH 加熱管：過冷却液入口 → 二相出口の
     Placement(transformation(origin = {-18, -10}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   Modelica.Blocks.Sources.Constant const(k = 0.1) annotation(
     Placement(transformation(origin = {24, 98}, extent = {{-10, -10}, {10, 10}})));
-  Component.Pipes.PipeSegment pipeSegment(redeclare package Medium = Medium, V = 0.001) annotation(
+  Component.Pipes.DynamicPipeSegment dynamicPipeSegment(redeclare package Medium = Medium, V = 0.001) annotation(
     Placement(transformation(origin = {-22, -54}, extent = {{-10, -10}, {10, 10}})));
   Thermal.HeatTransfer.Components.HeatCapacitor heatCapacitor annotation(
     Placement(transformation(origin = {-64, 72}, extent = {{-10, -10}, {10, 10}})));
@@ -24,11 +25,11 @@ equation
   // --- コンポーネント接続 ---
   connect(const.y, convection.Gc) annotation(
     Line(points = {{36, 98}, {52, 98}, {52, -10}, {-8, -10}}, color = {0, 0, 127}));
-  connect(convection.fluid, pipeSegment.heatPort) annotation(
+  connect(convection.fluid, dynamicPipeSegment.heatPort) annotation(
     Line(points = {{-18, -20}, {-18, -39.5}, {-22, -39.5}, {-22, -47}}, color = {191, 0, 0}));
-  connect(massFlowSource_T.port, pipeSegment.port_a) annotation(
+  connect(massFlowSource_T.port, dynamicPipeSegment.port_a) annotation(
     Line(points = {{-116, -56}, {-32, -56}, {-32, -54}}, color = {0, 127, 255}));
-  connect(pipeSegment.port_b, sink.port) annotation(
+  connect(dynamicPipeSegment.port_b, sink.port) annotation(
     Line(points = {{-12, -54}, {60, -54}}, color = {0, 127, 255}));
   connect(fixedHeatFlow.port, heatCapacitor.port_left) annotation(
     Line(points = {{-124, 76}, {-74, 76}, {-74, 72}}, color = {191, 0, 0}));
@@ -44,8 +45,8 @@ equation
   
   <h4>系の構成</h4>
   <pre>
-    MassFlowSource_T  →  PipeUniformHeatTransfer  →  Boundary_ph
-    (流量・T 固定)        (一様熱交換)                 (圧力固定)
+    MassFlowSource_T  →  DynamicPipeSegment  →  Boundary_ph
+    (流量・T 固定)        (加熱対象 CV)          (圧力固定)
                                 ↑
                FixedTemperature + Convection（HeatPort 経由で入熱）
   </pre>
@@ -63,9 +64,7 @@ equation
   <h4>エネルギー収支</h4>
   <p>
   <code>FixedTemperature</code> と <code>Convection</code> を使って、
-  <code>pipe.heatPort</code> へ管全体の代表熱ポート経由で入熱する。
-  <code>PipeUniformHeatTransfer</code> はこの熱流を内部の <code>nNodes</code> 個の
-  セグメントへ均等分配する。
+  <code>dynamicPipeSegment.heatPort</code> へ HeatPort 経由で入熱する。
   </p>
   
   <h4>観測変数</h4>
@@ -74,7 +73,7 @@ equation
   <li><code>T_out</code>, <code>d_out</code>, <code>phase_out</code> — 出口の温度・密度・相状態</li>
   <li><code>x_out</code>     — 出口乾き度（≈ 0.10 を期待）</li>
   <li><code>alpha_out</code> — 出口ボイド率（HEM）</li>
-  <li><code>pipe.pipe.segment[i].props.T</code> — i 番目セグメントの代表温度</li>
+  <li><code>dynamicPipeSegment.props.T</code> — セグメントの代表温度</li>
   </ul>
   </html>"));
 end TestPipeWithSource;

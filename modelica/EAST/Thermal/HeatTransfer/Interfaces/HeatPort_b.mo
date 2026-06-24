@@ -1,15 +1,9 @@
 within EAST.Thermal.HeatTransfer.Interfaces;
 connector HeatPort_b "集中熱ポート"
   extends EAST.Thermal.HeatTransfer.Interfaces.HeatPort;
-
+  extends EAST.Icons.HeatPort_b;
   annotation (
     defaultComponentName="port",
-    Icon(coordinateSystem(preserveAspectRatio=true), graphics={
-      Rectangle(
-        extent={{-100,100},{100,-100}},
-        lineColor={191,0,0},
-        fillColor={255,255,255},
-        fillPattern=FillPattern.Solid)}),
     Documentation(info="<html>
 <p>
 熱伝達コンポーネント用の熱ポートです。

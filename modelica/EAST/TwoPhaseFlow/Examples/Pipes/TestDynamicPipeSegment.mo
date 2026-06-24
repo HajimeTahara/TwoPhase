@@ -1,12 +1,13 @@
 within EAST.TwoPhaseFlow.Examples.Pipes;
 
-model TestPipeSegment
+model TestDynamicPipeSegment
+extends Modelica.Icons.Example;
   package Medium = EAST.TwoPhaseFlow.Media.LCH;
   EAST.Thermal.HeatTransfer.Components.HeatCapacitor s annotation(
     Placement(transformation(origin = {-10, 62}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow fixedHeatFlow(Q_flow = 300) annotation(
     Placement(transformation(origin = {-98, 62}, extent = {{-10, -10}, {10, 10}})));
-  EAST.TwoPhaseFlow.Component.Pipes.PipeSegment pipeSegment(redeclare package Medium = Medium, V = 0.01) annotation(
+  EAST.TwoPhaseFlow.Component.Pipes.DynamicPipeSegment dynamicPipeSegment(redeclare package Medium = Medium, V = 0.01) annotation(
     Placement(transformation(origin = {-14, -24}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Components.Convection convection annotation(
     Placement(transformation(origin = {-6, 16}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
@@ -21,13 +22,13 @@ equation
     Line(points = {{-88, 62}, {-20, 62}}, color = {191, 0, 0}));
   connect(s.port_bottom, convection.solid) annotation(
     Line(points = {{-10, 52}, {-6, 52}, {-6, 26}}, color = {191, 0, 0}));
-  connect(convection.fluid, pipeSegment.heatPort) annotation(
+  connect(convection.fluid, dynamicPipeSegment.heatPort) annotation(
     Line(points = {{-6, 6}, {-14, 6}, {-14, -16}}, color = {191, 0, 0}));
   connect(const.y, convection.Gc) annotation(
     Line(points = {{53, 40}, {69, 40}, {69, 16}, {3, 16}}, color = {0, 0, 127}));
-  connect(massFlowSource_T.port, pipeSegment.port_a) annotation(
+  connect(massFlowSource_T.port, dynamicPipeSegment.port_a) annotation(
     Line(points = {{-118, -28}, {-24, -28}, {-24, -24}}, color = {0, 127, 255}));
-  connect(pipeSegment.port_b, boundary_pT.port) annotation(
+  connect(dynamicPipeSegment.port_b, boundary_pT.port) annotation(
     Line(points = {{-4, -24}, {40, -24}, {40, -54}, {76, -54}}, color = {0, 127, 255}));
   annotation(experiment(StopTime = 100));
-end TestPipeSegment;
+end TestDynamicPipeSegment;

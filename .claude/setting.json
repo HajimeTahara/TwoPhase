@@ -2,6 +2,9 @@
 "permissions": {
     "deny": [
       "Edit(/ModelicaStandardLibrary/**)"
+    ],
+    "allow": [
+      "Edit(/modelica/EAST/Icons/**)"
     ]
   }
 }

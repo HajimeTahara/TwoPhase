@@ -9,7 +9,7 @@ model UniformHeatDistributor
     annotation (Placement(
       transformation(extent={{-10,90},{10,110}}),
       iconTransformation(extent={{-10,90},{10,110}})));
-  EAST.TwoPhaseFlow.Component.Interfaces.HeatPort_b distributedPorts[nPorts]
+  EAST.TwoPhaseFlow.Component.Interfaces.HeatPorts_b distributedPorts[nPorts]
     "分配先 HeatPort"
     annotation (Placement(
       transformation(extent={{-10,-110},{10,-90}}),

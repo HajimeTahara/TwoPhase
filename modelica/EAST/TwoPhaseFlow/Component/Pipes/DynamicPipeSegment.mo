@@ -1,21 +1,18 @@
 within EAST.TwoPhaseFlow.Component.Pipes;
 
-model PipeSegment "動的管セグメント（単一 well-mixed 制御容積; Pipe の内部要素）"
+model DynamicPipeSegment "動的管セグメント（単一 well-mixed 制御容積; DynamicPipe の内部要素）"
   replaceable package Medium = EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium annotation(
     choicesAllMatching = true);
-
   parameter Modelica.Units.SI.Volume V "セグメント容積 [m³]";
   parameter Modelica.Units.SI.PressureDifference dp(min = 0) = 0 "セグメント内の圧力損失 [Pa]（CV → port_b 方向の静的近似）";
   parameter Modelica.Units.SI.AbsolutePressure p_start = 1.0e5 "CV 内圧力の初期値 [Pa]";
   parameter Modelica.Units.SI.SpecificEnthalpy h_start = Medium.bubbleEnthalpy(Medium.setSat_p(p_start)) "CV 内比エンタルピーの初期値 [J/kg]（既定: p_start における飽和液）";
-
   EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_a port_a(redeclare package Medium = Medium) "上流ポート（入口）" annotation(
     Placement(transformation(extent = {{-110, -10}, {-90, 10}})));
   EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_b port_b(redeclare package Medium = Medium) "下流ポート（出口）" annotation(
     Placement(transformation(extent = {{90, -10}, {110, 10}})));
   EAST.TwoPhaseFlow.Component.Interfaces.HeatPort_a heatPort "外部熱源との接続用ポート（port.T = CV内の代表流体温度）" annotation(
-    Placement(transformation(extent = {{-10, 40}, {10, 60}}), iconTransformation(origin = {0, 20}, extent = {{-10, 40}, {10, 60}})));
-
+    Placement(transformation(extent = {{-10, 40}, {10, 60}}), iconTransformation(origin = {0, -6}, extent = {{-10, 40}, {10, 60}})));
   // 状態変数（CV: このセグメントの容積 V に蓄えられた流体の代表状態）
   Modelica.Units.SI.AbsolutePressure p(start = p_start) "CV 内圧力 [Pa]（状態変数; port_a.p と一致）";
   Modelica.Units.SI.SpecificEnthalpy h(start = h_start) "CV 内比エンタルピー [J/kg]（状態変数; port_b.h_outflow と一致）";
@@ -42,11 +39,11 @@ equation
 // --- HeatPort 温度（CV の動的温度を使用）---
   heatPort.T = props.T;
   annotation(
-    Icon(coordinateSystem(preserveAspectRatio = false), graphics = {Rectangle(extent = {{-100, 30}, {100, -30}}, lineColor = {0, 0, 255}, fillColor = {0, 170, 255}, fillPattern = FillPattern.HorizontalCylinder), Text(extent = {{-100, 60}, {100, 42}}, lineColor = {0, 0, 0}, textString = "%name")}),
+    Icon(coordinateSystem(preserveAspectRatio = false), graphics = {Text(origin = {0, -233}, textColor = {0, 0, 255},extent = {{-100, 133}, {100, 93}}, textString = "%name"), Rectangle(fillColor = {0, 127, 255}, fillPattern = FillPattern.HorizontalCylinder, extent = {{-100, 44}, {100, -44}})}),
     Documentation(info = "<html>
 <p>
-<code>Pipe</code> の内部要素として使う、単一 well-mixed 制御容積（CV）モデル。
-<code>Pipe</code> は本モデルを <code>nNodes</code> 個直列接続し、管内流体の移流
+<code>DynamicPipe</code> の内部要素として使う、単一 well-mixed 制御容積（CV）モデル。
+<code>DynamicPipe</code> は本モデルを <code>nNodes</code> 個直列接続し、管内流体の移流
 （軸方向の質量・エンタルピー輸送）を近似する。単体としても利用可能。
 </p>
 
@@ -65,10 +62,11 @@ equation
 <h4>制限事項</h4>
 <ul>
 <li>1 CV 単体では well-mixed（井戸混合）近似であり、管内の移流（プラグフロー）は表現できない。
-    移流を表現するには <code>Pipe</code> 経由で複数セグメントを直列接続すること。</li>
+    移流を表現するには <code>DynamicPipe</code> 経由で複数セグメントを直列接続すること。</li>
 <li>このバランスは <code>Medium</code> の密度・内部エネルギー関数を介して
     <code>der(M)</code>, <code>der(U)</code> を時間微分する陰関数 DAE であり、
     ツールが当該関数を自動微分（ダミー微分・指標低減）できることを前提とする。</li>
 </ul>
-</html>"));
-end PipeSegment;
+</html>"),
+    Diagram(graphics));
+end DynamicPipeSegment;

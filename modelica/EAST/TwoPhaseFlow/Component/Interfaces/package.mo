@@ -10,10 +10,14 @@ package Interfaces "コンポーネント用インターフェース（コネク
 <li><code>FluidPort</code>   — 二相流体ポート基底（replaceable Medium, p, m_dot, h_outflow）</li>
 <li><code>FluidPort_a</code> — 入口ポート（塗りつぶし円）</li>
 <li><code>FluidPort_b</code> — 出口ポート（白抜き円）</li>
+<li><code>FluidPorts_a</code> — FluidPort 配列を公開するための塗りつぶし縦長ポート</li>
+<li><code>FluidPorts_b</code> — FluidPort 配列を公開するための白抜き縦長ポート</li>
 <li><code>HeatPort</code>    — 熱ポート基底（T, Q_flow）。MSL の <code>HeatPort</code> を
     extends せず独立に再実装したもの</li>
 <li><code>HeatPort_a</code>  — 熱を受け取る側のポート（塗りつぶし矩形）</li>
 <li><code>HeatPort_b</code>  — 熱を供給する側のポート（白抜き矩形）</li>
+<li><code>HeatPorts_a</code> — HeatPort 配列を公開するための塗りつぶし横長ポート</li>
+<li><code>HeatPorts_b</code> — HeatPort 配列を公開するための白抜き横長ポート</li>
 </ul>
 </html>"));
 end Interfaces;

@@ -32,11 +32,8 @@ model SegmentedThermalConductor
     each V = V_segment,
     each material = material,
     T_start = T_start) "長さ方向に分割した集中熱容量";
-
-  EAST.Thermal.HeatTransfer.Interfaces.HeatPort_a port_a "熱ポート a"
-    annotation (Placement(
-      transformation(extent={{-110,-10},{-90,10}}),
-      iconTransformation(extent={{-110,-10},{-90,10}})));
+  EAST.Thermal.HeatTransfer.Interfaces.HeatPort_a port_a "熱ポート a" annotation(
+    Placement(transformation(extent = {{-110, -10}, {-90, 10}}), iconTransformation(extent = {{-110, -10}, {-90, 10}})));
   EAST.Thermal.HeatTransfer.Interfaces.HeatPort_b port_b "熱ポート b"
     annotation (Placement(
       transformation(extent={{90,-10},{110,10}}),
@@ -64,39 +61,9 @@ equation
   port_b.Q_flow = G_boundary * (port_b.T - segment[nSegments].T);
   segment[nSegments].port_right.Q_flow = port_b.Q_flow;
 
-  annotation (Icon(coordinateSystem(preserveAspectRatio=true), graphics={
-      Rectangle(
-        extent={{-70,24},{70,-24}},
-        lineColor={191,0,0},
-        fillColor={255,170,170},
-        fillPattern=FillPattern.Solid),
-      Line(
-        points={{-42,24},{-42,-24}},
-        color={191,0,0}),
-      Line(
-        points={{-14,24},{-14,-24}},
-        color={191,0,0}),
-      Line(
-        points={{14,24},{14,-24}},
-        color={191,0,0}),
-      Line(
-        points={{42,24},{42,-24}},
-        color={191,0,0}),
-      Line(
-        points={{-100,0},{-70,0}},
-        color={191,0,0}),
-      Line(
-        points={{70,0},{100,0}},
-        color={191,0,0}),
-      Text(
-        extent={{-100,74},{100,50}},
-        textString="%name",
-        lineColor={0,0,0}),
-      Text(
-        extent={{-100,-50},{100,-74}},
-        textString="n=%nSegments",
-        lineColor={0,0,0})}),
-    Documentation(info="<html>
+  annotation(
+    Icon(coordinateSystem(preserveAspectRatio = true), graphics = {Text(origin = {0, 20}, extent = {{-100, -80}, {100, -120}}, textString = "n=%nSegments"), Rectangle(fillColor = {192, 192, 192}, pattern = LinePattern.None, fillPattern = FillPattern.Backward, extent = {{-80, 60}, {80, -60}}), Line(origin = {10, -10}, points = {{-90, 70}, {-90, -50}}, thickness = 0.5), Line(origin = {170, -10}, points = {{-90, 70}, {-90, -50}}, thickness = 0.5), Text(origin = {0, -220}, textColor = {0, 0, 255}, extent = {{-100, 120}, {100, 80}}, textString = "%name"), Line(origin = {50, -10}, points = {{-90, 70}, {-90, -50}}, color = {121, 0, 0}, pattern = LinePattern.Dash, thickness = 2), Line(origin = {130, -10}, points = {{-90, 70}, {-90, -50}}, color = {121, 0, 0}, pattern = LinePattern.Dash, thickness = 2), Line(origin = {90, -10}, points = {{-90, 70}, {-90, -50}}, color = {121, 0, 0}, pattern = LinePattern.Dash, thickness = 2)}),
+    Documentation(info = "<html>
 <p>
 長さ方向の熱伝導を複数の集中熱容量と熱抵抗で近似する動的モデルです。
 </p>
@@ -110,5 +77,6 @@ equation
 端面から端部セグメント中心までは半セル長 <code>dx/2</code>、セグメント間は
 中心間距離 <code>dx</code> の熱抵抗として扱います。
 </p>
-</html>"));
+</html>"),
+  Diagram(graphics));
 end SegmentedThermalConductor;

@@ -1,6 +1,7 @@
 within EAST.TwoPhaseFlow.Examples.Media;
 
 model TestFluidProperties "LCH 流体の BaseProperties 使用例"
+extends Modelica.Icons.Example;
   package Medium = EAST.TwoPhaseFlow.Media.LCH;
   parameter Modelica.Units.SI.SpecificEnthalpy h_start = 0 "開始時の比エンタルピー [J/kg]";
   parameter Modelica.Units.SI.SpecificEnthalpy h_end = 600000 "終了時の比エンタルピー [J/kg]";
