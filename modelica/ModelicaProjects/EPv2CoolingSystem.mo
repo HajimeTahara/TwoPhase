@@ -1,7 +1,7 @@
 within ModelicaProjects;
 
 model EPv2CoolingSystem
-
+extends Modelica.Icons.Example;
 parameter Real p_system_in=0.55*10^6"Pa";
 parameter Real p_system_out=0.1*10^6"Pa";
 parameter Real T_system_in=100"K";

@@ -2,7 +2,7 @@ within EAST.TwoPhaseFlow.Component.Tanks;
 
 model OpenTank
   "開放タンク（自由表面を大気圧に固定した well-mixed モデル）"
-
+  extends EAST.Icons.OpenTank;
   replaceable package Medium = EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium
     annotation (choicesAllMatching=true);
 
@@ -76,18 +76,7 @@ equation
     "OpenTank level exceeded tank height.");
 
   annotation (
-    Icon(coordinateSystem(preserveAspectRatio=false), graphics={
-      Rectangle(
-        extent={{-70,70},{70,-70}},
-        lineColor={0,0,255},
-        fillColor={170,213,255},
-        fillPattern=FillPattern.Solid),
-      Line(points={{-70,70},{-70,90},{70,90},{70,70}}, color={0,0,255}),
-      Line(points={{-50,10},{50,10}}, color={0,0,255}),
-      Text(
-        extent={{-100,110},{100,86}},
-        lineColor={0,0,0},
-        textString="%name")}),
+    Icon(coordinateSystem(preserveAspectRatio = false)),
     Documentation(info="<html>
 <p>
 自由表面を持つ開放タンクの簡易モデル。

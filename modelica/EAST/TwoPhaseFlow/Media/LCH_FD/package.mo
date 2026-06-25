@@ -1,8 +1,8 @@
 within EAST.TwoPhaseFlow.Media;
-package LCH "液体メタン (CH4) 媒体パッケージ"
+package LCH_FD "単相密度を固定化した液体メタン (CH4) 媒体パッケージ"
   extends Modelica.Icons.VariantsPackage;
-  extends EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium(
-    mediumName = "Liquid Methane (CH4)",
+  extends EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMediumFD(
+    mediumName = "Liquid Methane (CH4), fixed single-phase density",
     singleState = false,
     redeclare constant MolarMass MM_const = Common.LCHData.MM_const,
     redeclare constant Temperature T_critical = Common.LCHData.T_critical,
@@ -39,11 +39,12 @@ package LCH "液体メタン (CH4) 媒体パッケージ"
 
   annotation (Documentation(info="<html>
 <p>
-液体メタン (CH4) の通常媒体モデル。
+<code>Common.LCHData</code> の物質定数と飽和物性表を使用し、
+<code>PartialTwoPhaseMediumFD</code> の固定単相密度モデルを適用する液体メタン媒体。
 </p>
 <p>
-物質定数と飽和物性表は <code>Common.LCHData</code> を参照し、
-単相密度は <code>PartialTwoPhaseMedium</code> の Peng-Robinson 状態方程式で計算する。
+単相密度は標準大気圧における飽和液密度を飽和表から補間した一定値である。
+二相域の密度は従来の均質平衡モデルで計算する。
 </p>
 </html>"));
-end LCH;
+end LCH_FD;

@@ -1,6 +1,7 @@
 within ModelicaProjects;
 
 model SpeedProfile
+  extends Modelica.Icons.Example;
   Modelica.Mechanics.Rotational.Sources.Speed speed(exact = false, f_crit = 5) annotation(
     Placement(transformation(extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Sources.CombiTimeTable rpmTable(columns = {2}, table = [0, 0; 1, 0; 3, 1500; 20, 1500; 25, 3000; 50, 3000]) annotation(

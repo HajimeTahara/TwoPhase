@@ -7,12 +7,7 @@ record Sus304 "SUS304 ステンレス鋼の代表物性値"
 
   annotation (Documentation(info="<html>
 <p>
-SUS304 ステンレス鋼の代表的な室温付近の物性値です。
+SUS304 ステンレス鋼の室温付近の物性値
 </p>
-<ul>
-<li>密度: 7930 kg/m3</li>
-<li>比熱: 500 J/(kg.K)</li>
-<li>熱伝導率: 16.2 W/(m.K)</li>
-</ul>
 </html>"));
 end Sus304;

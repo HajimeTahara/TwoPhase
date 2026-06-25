@@ -3,3 +3,4 @@ ThermalConductor
 Convection
 SegmentedThermalConductor
 CylindricalThermalConductor
+SegmentedCylindricalThermalConductor

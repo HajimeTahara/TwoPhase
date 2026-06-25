@@ -1,22 +1,7 @@
 within EAST.Icons;
 partial model OpenTank
   "MSL Modelica.Fluid.Vessels.OpenTank の開放タンクアイコン"
-  annotation (Icon(coordinateSystem(preserveAspectRatio=true, extent={{-100,-100},{100,100}}, initialScale=0.2), graphics={
-        Rectangle(
-          extent={{-100,100},{100,-100}},
-          lineColor={0,0,0},
-          fillColor={255,255,255},
-          fillPattern=FillPattern.VerticalCylinder,
-          pattern=LinePattern.None),
-        Rectangle(
-          extent={{-100,-100},{100,10}},
-          fillColor={85,170,255},
-          fillPattern=FillPattern.VerticalCylinder),
-        Line(points={{-100,100},{-100,-100},{100,-100},{100,100}}),
-        Text(
-          extent={{-150,110},{150,150}},
-          textColor={0,0,255},
-          textString="%name")}), Documentation(info="<html>
+  annotation (Icon(coordinateSystem(preserveAspectRatio = true, extent = {{-100, -100}, {100, 100}}, initialScale = 0.2), graphics = {Rectangle(extent = {{-100, 100}, {100, -100}}, lineColor = {0, 0, 0}, fillColor = {255, 255, 255}, fillPattern = FillPattern.VerticalCylinder, pattern = LinePattern.None), Rectangle(extent = {{-100, -100}, {100, 10}}, fillColor = {85, 170, 255}, fillPattern = FillPattern.VerticalCylinder), Line(points = {{-100, 100}, {-100, -100}, {100, -100}, {100, 100}}), Text(extent = {{-150, 110}, {150, 150}}, textColor = {0, 0, 255}, textString = "%name"), Text(origin = {0, 14}, textColor = {0, 0, 255}, extent = {{-139, -114}, {141, -154}}, textString = "%name")}), Documentation(info="<html>
 <p>
 MSL <code>Modelica.Fluid.Vessels.OpenTank</code>（自由表面を持つ開放タンク）の
 アイコンを流用するための <code>partial model</code> です。
@@ -32,5 +17,6 @@ MSL <code>Modelica.Fluid.Vessels.OpenTank</code>（自由表面を持つ開放�
 出典: Modelica.Fluid.Vessels.OpenTank (Modelica Standard Library),
 Copyright &copy; 2002-2025, Modelica Association and contributors.
 </p>
-</html>"));
+</html>"),
+  Diagram(graphics));
 end OpenTank;

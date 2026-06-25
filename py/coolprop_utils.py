@@ -77,6 +77,8 @@ def get_fluid_constants(fluid: str, p_ref: float = 101325.0) -> dict[str, float]
         "d_critical":       PropsSI("rhomass_critical", fluid),
         "T_triple":         PropsSI("Ttriple", fluid),
         "p_triple":         PropsSI("ptriple", fluid),
+        "T_min":            PropsSI("Ttriple", fluid),
+        "T_max":            PropsSI("Tcrit", fluid),
         "T_normal_boiling": PropsSI("T", "P", 101325.0, "Q", 0, fluid),
         "omega":            PropsSI("acentric", fluid),
         "cp_liquid":        sat_ref["cp_l"],

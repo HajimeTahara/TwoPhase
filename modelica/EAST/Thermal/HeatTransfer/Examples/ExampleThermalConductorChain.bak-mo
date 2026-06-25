@@ -1,0 +1,47 @@
+within EAST.Thermal.HeatTransfer.Examples;
+
+model ExampleThermalConductorChain "熱容量・熱伝導要素を直列につないだときの温度応答を確認するサンプル"
+  parameter Modelica.Units.SI.HeatFlowRate Q_flow_in = 100 "capacitor へ与える加熱量（正: 加熱）";
+  parameter Modelica.Units.SI.Temperature T_sink = 293.15 "capacitor1 側の固定温度（熱浴）";
+  parameter Modelica.Units.SI.Temperature T_hot = 373.15 "conductor1 の port_a 側固定温度";
+  parameter Modelica.Units.SI.Temperature T_cold = 293.15 "conductor1 の port_b 側固定温度";
+  EAST.Thermal.HeatTransfer.Components.HeatCapacitor capacitor(V = 0.1^3, T_start = 293.15, material = EAST.Thermal.Material.Sus304()) "加熱される熱容量";
+  EAST.Thermal.HeatTransfer.Components.ThermalConductor conductor(A = 0.1*0.1, L = 1, material = EAST.Thermal.Material.Sus304()) "capacitor と capacitor1 をつなぐ熱伝導要素";
+  EAST.Thermal.HeatTransfer.Components.HeatCapacitor capacitor1(V = 0.1^3, T_start = 293.15, material = EAST.Thermal.Material.Sus304()) "固定温度側の熱容量";
+  EAST.Thermal.HeatTransfer.Components.SegmentedThermalConductor conductor1(A = 0.1*0.1, L = 1, material = EAST.Thermal.Material.Sus304()) "両端を固定温度で挟んだ長さ方向分割熱伝導要素";
+equation
+  capacitor.port_left.Q_flow = Q_flow_in;
+  connect(capacitor.port_right, conductor.port_a);
+  connect(conductor.port_b, capacitor1.port_left);
+  capacitor1.port_right.T = T_sink;
+  conductor1.port_a.T = T_hot;
+  conductor1.port_b.T = T_cold;
+  annotation(
+    experiment(StopTime = 300, Interval = 0.5),
+    Documentation(info = "<html>
+<p>
+このサンプルは独立した 2 つの構成を含みます。
+</p>
+<p>
+1 つ目は <code>capacitor</code> に一定の熱流量 <code>Q_flow_in</code> を与え、
+<code>conductor</code>（<code>ThermalConductor</code>）を介して <code>capacitor1</code> へ
+熱が伝わり、最終的に固定温度 <code>T_sink</code> へ放熱されるまでの過渡応答を確認します。
+<code>capacitor</code>・<code>conductor</code>・<code>capacitor1</code> は EAST 独自の
+<code>HeatPort</code> 同士なので <code>connect()</code> で接続し、境界条件
+（<code>Q_flow_in</code>・<code>T_sink</code>）のみ直接式で与えています。
+</p>
+<p>
+2 つ目は <code>conductor1</code>（<code>SegmentedThermalConductor</code>）の両端
+<code>port_a</code>・<code>port_b</code> に固定温度 <code>T_hot</code>・<code>T_cold</code> を
+直接与え、各セグメントの温度 <code>conductor1.T[1:nSegments]</code> の時間応答を確認します。
+</p>
+<p>
+境界条件には <code>Modelica.Thermal.HeatTransfer.Sources</code>（MSL）のコンポーネントは
+使用していません。MSL の <code>HeatPort</code> と EAST 独自の <code>HeatPort</code> は
+構造は同じでも別のコネクタクラスであり、混在させると接続が正しく解釈されず
+（流量の収支式が欠落するなどして）翻訳時の式数不整合（singular system）を
+引き起こすことがあるためです。境界条件は <code>port.T</code>・<code>port.Q_flow</code> に
+直接式を与えることで EAST 独自コネクタの範囲内に閉じています。
+</p>
+</html>"));
+end ExampleThermalConductorChain;

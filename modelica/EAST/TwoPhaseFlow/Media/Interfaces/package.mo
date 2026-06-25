@@ -9,6 +9,7 @@ MSL 非依存設計。
 <h4>基底クラス</h4>
 <ul>
 <li><code>PartialTwoPhaseMedium</code> — 媒体の抽象基底クラス</li>
+<li><code>PartialTwoPhaseMediumFD</code> — 単相密度を固定化した媒体の抽象基底クラス</li>
 </ul>
 </html>"));
 end Interfaces;

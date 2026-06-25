@@ -137,9 +137,6 @@ MSL の `replaceable function` / `redeclare function extends` パターンは採
 
 ## 担当範囲の制限（グランドルール）
 
-`modelica/EAST/Thermal/` 配下は別チームが担当する。
-**Claude Code はこのディレクトリ内のファイルを読み書きしてはならない。**
-
 ## セッション記録ルール（グランドルール）
 
 セッション中に設計判断・実装変更・議論があった場合、**必ず以下のファイルに記録する。**

@@ -33,3 +33,7 @@ GeneralValve
 TeeJunction
 DynamicPipe
 StaticPipe
+DynamicPipeSegment
+GasPressuredTank
+CylinderThermal
+HexPipe

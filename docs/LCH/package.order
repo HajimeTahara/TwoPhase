@@ -4,6 +4,8 @@ p_critical
 d_critical
 T_triple
 p_triple
+T_min
+T_max
 T_normal_boiling
 omega_const
 cp_liquid_const

@@ -1,0 +1,28 @@
+within EAST.Thermal.HeatTransfer.Examples;
+
+model ExampleSegmentedCylindricalThermalConductor "内側の一部のノードのみ加熱し、長さ方向・半径方向への熱伝導を確認するサンプル"
+  parameter Integer nLayers = 2 "確認対象の層数";
+  parameter Integer nNode = 5 "確認対象の長さ方向分割数";
+  parameter Modelica.Units.SI.Temperature T_inner_hot = 400 "第 1 ノードの port_inner 固定温度";
+  parameter Modelica.Units.SI.Temperature T_inner_rest = 293.15 "第 1 ノード以外の port_inner 固定温度";
+  parameter Modelica.Units.SI.Temperature T_outer = 293.15 "port_outer 側の固定温度（全ノード共通）";
+equation
+  for j in 1:nNode loop
+    conductor.port_inner[j].T = if j == 1 then T_inner_hot else T_inner_rest;
+  end for;
+  conductor.port_outer.T = fill(T_outer, nNode);
+  annotation(
+    experiment(StopTime = 300, Interval = 0.5),
+    Documentation(info = "<html>
+<p>
+長さ方向の第 1 ノードの <code>port_inner[1]</code> のみを高温に固定し、残りのノードの
+<code>port_inner</code> はより低い温度に固定、<code>port_outer</code> は全ノードで
+低温に固定したときの温度分布 <code>conductor.T[1:nLayers, 1:nNode]</code> を確認する
+サンプルです。
+</p>
+<p>
+半径方向の熱伝導に加えて、長さ方向の熱伝導により第 1 ノードの熱が隣接ノードへ
+伝わり、局所的な加熱が長さ方向になめらかに広がっていく様子を確認できます。
+</p>
+</html>"));
+end ExampleSegmentedCylindricalThermalConductor;

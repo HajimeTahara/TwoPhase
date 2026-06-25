@@ -1,0 +1,22 @@
+within EAST.Thermal.HeatTransfer.Examples;
+
+model ExampleConvection "Convection に流速と固体・流体温度を与えたときの熱伝達率・熱流量を確認するサンプル"
+  parameter Modelica.Units.SI.Velocity v = 5 "流体の代表流速";
+  parameter Modelica.Units.SI.Temperature T_solid = 350 "固体側の固定温度";
+  parameter Modelica.Units.SI.Temperature T_fluid = 300 "流体側の固定温度";
+  EAST.Thermal.HeatTransfer.Components.Convection convection "確認対象の対流熱伝達要素"annotation(
+    Placement(transformation(origin = {-3, -5}, extent = {{-39, -39}, {39, 39}})));
+equation
+  convection.velocity = v;
+  convection.solid.T = T_solid;
+  convection.fluid.T = T_fluid;
+  annotation(
+    experiment(StopTime = 10, Interval = 0.1),
+    Documentation(info = "<html>
+<p>
+<code>Convection</code> に流速 <code>v</code> と固体側・流体側の固定温度を与え、
+Reynolds 数・Nusselt 数から求まる熱伝達率 <code>convection.alpha</code> と
+熱流量 <code>convection.Q_flow</code> が時間に依らず一定となることを確認します。
+</p>
+</html>"));
+end ExampleConvection;

@@ -1,0 +1,20 @@
+within EAST.Thermal.HeatTransfer.Examples;
+
+model ExampleThermalConductor "ThermalConductor の両端に固定温度を与えたときの定常熱流量を確認するサンプル"
+  parameter Modelica.Units.SI.Temperature T_a = 350 "port_a 側の固定温度";
+  parameter Modelica.Units.SI.Temperature T_b = 300 "port_b 側の固定温度";
+  EAST.Thermal.HeatTransfer.Components.ThermalConductor conductor "確認対象の熱伝導要素"annotation(
+    Placement(transformation(origin = {-3, -5}, extent = {{-39, -39}, {39, 39}})));
+equation
+  conductor.port_a.T = T_a;
+  conductor.port_b.T = T_b;
+  annotation(
+    experiment(StopTime = 10, Interval = 0.1),
+    Documentation(info = "<html>
+<p>
+<code>ThermalConductor</code> の両端 <code>port_a</code>・<code>port_b</code> に固定温度を与え、
+熱コンダクタンス <code>conductor.G</code> から求まる熱流量
+<code>conductor.port_a.Q_flow = G*(T_a - T_b)</code> が時間に依らず一定となることを確認します。
+</p>
+</html>"));
+end ExampleThermalConductor;

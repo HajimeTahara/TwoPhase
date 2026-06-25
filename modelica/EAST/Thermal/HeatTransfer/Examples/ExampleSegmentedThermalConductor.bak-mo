@@ -1,0 +1,26 @@
+within EAST.Thermal.HeatTransfer.Examples;
+
+model ExampleSegmentedThermalConductor "境界温度をステップ変化させ、長さ方向の温度伝播の遅れを確認するサンプル"
+  parameter Modelica.Units.SI.Temperature T_a_initial = 293.15 "port_a 側のステップ変化前の温度";
+  parameter Modelica.Units.SI.Temperature T_a_final = 400 "port_a 側のステップ変化後の温度";
+  parameter Modelica.Units.SI.Time t_step = 10 "port_a 側の温度をステップ変化させる時刻";
+  parameter Modelica.Units.SI.Temperature T_b = 293.15 "port_b 側の固定温度";
+  EAST.Thermal.HeatTransfer.Components.SegmentedThermalConductor conductor(nSegments = 5) "確認対象の長さ方向分割熱伝導要素"annotation(
+    Placement(transformation(origin = {-3, -5}, extent = {{-39, -39}, {39, 39}})));
+equation
+  conductor.port_a.T = if time < t_step then T_a_initial else T_a_final;
+  conductor.port_b.T = T_b;
+  annotation(
+    experiment(StopTime = 300, Interval = 0.5),
+    Documentation(info = "<html>
+<p>
+<code>port_a</code> の温度を時刻 <code>t_step</code> でステップ変化させ、<code>port_b</code> を
+固定温度に保ったときの、各セグメントの温度 <code>conductor.T[1:nSegments]</code> の
+時間応答を確認するサンプルです。
+</p>
+<p>
+セグメントごとに熱容量を持つため、<code>port_a</code> から離れたセグメントほど温度変化が
+遅れて伝わる様子を <code>conductor.T</code> をプロットすることで確認できます。
+</p>
+</html>"));
+end ExampleSegmentedThermalConductor;

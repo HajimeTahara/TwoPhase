@@ -1,0 +1,65 @@
+within EAST.Thermal.HeatTransfer.Examples;
+
+model ExampleHeatCapacitor "HeatCapacitor へ一定の熱流量を与えたときの温度上昇を確認するサンプル"
+  parameter Integer n=10;
+  EAST.Thermal.HeatTransfer.Components.HeatCapacitor capacitor(V = 0.1^3, T_start = 293.15, material = EAST.Thermal.Material.Sus304()) "確認対象の熱容量要素"annotation(
+    Placement(transformation(origin = {-60, 60}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow fixedHeatFlow(Q_flow = 100)  annotation(
+    Placement(transformation(origin = {-114, 60}, extent = {{-10, -10}, {10, 10}})));
+  EAST.Thermal.HeatTransfer.Components.ThermalConductor conductor(A = 0.1*0.1, L = 1, material = EAST.Thermal.Material.Sus304())  "確認対象の熱伝導要素" annotation(
+    Placement(transformation(origin = {0, 60}, extent = {{-10, -10}, {10, 10}})));
+  EAST.Thermal.HeatTransfer.Components.HeatCapacitor capacitor1(T_start = 293.15, V = 0.1^3, material = EAST.Thermal.Material.Sus304()) "確認対象の熱容量要素" annotation(
+    Placement(transformation(origin = {58, 60}, extent = {{-10, -10}, {10, 10}})));
+  EAST.Thermal.HeatTransfer.Components.SegmentedThermalConductor conductor1(material = EAST.Thermal.Material.Sus304(), T_start = fill(20 + 273.15, n), A = 0.1*0.1, L = 0.1, nSegments = n) "確認対象の長さ方向分割熱伝導要素" annotation(
+    Placement(transformation(origin = {2, -42}, extent = {{-30, -30}, {30, 30}})));
+  Modelica.Thermal.HeatTransfer.Sources.FixedTemperature fixedTemperature annotation(
+    Placement(transformation(origin = {104, 60}, extent = {{10, -10}, {-10, 10}})));
+  Modelica.Thermal.HeatTransfer.Sources.FixedTemperature fixedTemperature1(T = 473.15) annotation(
+    Placement(transformation(origin = {-64, -42}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Thermal.HeatTransfer.Sources.FixedTemperature fixedTemperature2(T = 293.15) annotation(
+    Placement(transformation(origin = {72, -42}, extent = {{10, -10}, {-10, 10}})));
+  EAST.Thermal.HeatTransfer.Components.SegmentedThermalConductor conductor11(A = 0.1*0.1, L = 0.1, T_start = fill(20 + 273.15, n), material = EAST.Thermal.Material.Sus304(), nSegments = n) "確認対象の長さ方向分割熱伝導要素" annotation(
+    Placement(transformation(origin = {2, -140}, extent = {{-30, -30}, {30, 30}})));
+  Components.Convection convection(A = 10)  annotation(
+    Placement(transformation(origin = {66, -140}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Thermal.HeatTransfer.Sources.FixedTemperature fixedTemperature21(T = 253.15) annotation(
+    Placement(transformation(origin = {106, -140}, extent = {{10, -10}, {-10, 10}})));
+  Modelica.Blocks.Sources.Constant const(k = 10)  annotation(
+    Placement(transformation(origin = {106, -94}, extent = {{10, -10}, {-10, 10}})));
+  Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow fixedHeatFlow1(Q_flow = 100)  annotation(
+    Placement(transformation(origin = {-76, -140}, extent = {{-10, -10}, {10, 10}})));
+equation
+  connect(fixedHeatFlow.port, capacitor.port_left) annotation(
+    Line(points = {{-104, 60}, {-70, 60}}, color = {191, 0, 0}));
+  connect(capacitor.port_right, conductor.port_a) annotation(
+    Line(points = {{-50, 60}, {-10, 60}}, color = {191, 0, 0}));
+  connect(conductor.port_b, capacitor1.port_left) annotation(
+    Line(points = {{10, 60}, {48, 60}}, color = {191, 0, 0}));
+  connect(capacitor1.port_right, fixedTemperature.port) annotation(
+    Line(points = {{68, 60}, {94, 60}}, color = {191, 0, 0}));
+  connect(fixedTemperature1.port, conductor1.port_a) annotation(
+    Line(points = {{-54, -42}, {-28, -42}}, color = {191, 0, 0}));
+  connect(conductor1.port_b, fixedTemperature2.port) annotation(
+    Line(points = {{32, -42}, {62, -42}}, color = {191, 0, 0}));
+  connect(conductor11.port_b, convection.solid) annotation(
+    Line(points = {{32, -140}, {56, -140}}, color = {191, 0, 0}));
+  connect(convection.fluid, fixedTemperature21.port) annotation(
+    Line(points = {{76, -140}, {96, -140}}, color = {191, 0, 0}));
+  connect(convection.velocity, const.y) annotation(
+    Line(points = {{66, -130}, {66, -94}, {95, -94}}, color = {0, 0, 127}));
+  connect(fixedHeatFlow1.port, conductor11.port_a) annotation(
+    Line(points = {{-66, -140}, {-28, -140}}, color = {191, 0, 0}));
+  annotation(
+    experiment(StopTime = 1000, Interval = 0.1),
+    Documentation(info = "<html>
+<p>
+<code>HeatCapacitor</code> の <code>port_top</code> に一定の熱流量 <code>Q_flow_in</code> を
+与え、温度 <code>capacitor.T</code> が時間とともに線形に上昇することを確認するサンプルです。
+</p>
+<p>
+<code>port_right</code>・<code>port_bottom</code>・<code>port_left</code> はどこにも接続しないため、
+Modelica の仕様により熱流量が自動的にゼロとして扱われます。
+</p>
+</html>"),
+  Diagram(coordinateSystem(extent = {{-140, 80}, {120, -80}})));
+end ExampleHeatCapacitor;

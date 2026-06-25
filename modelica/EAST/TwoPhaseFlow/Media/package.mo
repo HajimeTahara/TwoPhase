@@ -7,9 +7,10 @@ package Media "気液二相流体の熱物性パッケージ"
 </p>
 <h4>サブパッケージ</h4>
 <ul>
-<li><code>Interfaces</code> — 媒体抽象基底クラス (<code>PartialTwoPhaseMedium</code>)</li>
+<li><code>Interfaces</code> — 媒体抽象基底クラス</li>
 <li><code>Common</code>     — 共通ユーティリティ・型定義</li>
 <li><code>LCH</code>        — 液体メタン (CH₄) 媒体実装</li>
+<li><code>LCH_FD</code>     — 単相密度を固定化した液体メタン媒体実装</li>
 </ul>
 </html>"));
 end Media;

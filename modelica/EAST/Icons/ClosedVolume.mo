@@ -1,15 +1,7 @@
 within EAST.Icons;
 partial model ClosedVolume
   "MSL Modelica.Fluid.Vessels.ClosedVolume の密閉容器アイコン"
-  annotation (Icon(coordinateSystem(preserveAspectRatio=true, extent={{-100,-100},{100,100}}), graphics={
-        Ellipse(
-          extent={{-100,100},{100,-100}},
-          fillPattern=FillPattern.Sphere,
-          fillColor={170,213,255}),
-        Text(
-          extent={{-150,110},{150,150}},
-          textColor={0,0,255},
-          textString="%name")}), Documentation(info="<html>
+  annotation (Icon(coordinateSystem(preserveAspectRatio = true, extent = {{-100, -100}, {100, 100}}), graphics = {Ellipse(extent = {{-100, 100}, {100, -100}}, fillPattern = FillPattern.Sphere, fillColor = {170, 213, 255}), Text(extent = {{-150, 110}, {150, 150}}, textColor = {0, 0, 255}, textString = "%name"), Text(origin = {0, 14}, textColor = {0, 0, 255}, extent = {{-139, -114}, {141, -154}}, textString = "%name"), Text(extent = {{-150, 12}, {150, -18}}, textString = "V=%V")}), Documentation(info="<html>
 <p>
 MSL <code>Modelica.Fluid.Vessels.ClosedVolume</code>（容積固定の密閉容器）の
 アイコンを流用するための <code>partial model</code> です。
@@ -23,5 +15,6 @@ MSL <code>Modelica.Fluid.Vessels.ClosedVolume</code>（容積固定の密閉容�
 出典: Modelica.Fluid.Vessels.ClosedVolume (Modelica Standard Library),
 Copyright &copy; 2002-2025, Modelica Association and contributors.
 </p>
-</html>"));
+</html>"),
+  Diagram(graphics));
 end ClosedVolume;

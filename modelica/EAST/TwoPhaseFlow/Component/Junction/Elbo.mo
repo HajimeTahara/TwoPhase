@@ -1,5 +1,6 @@
 within EAST.TwoPhaseFlow.Component.Junction;
 model Elbo "エルボ部の簡易局所圧力損失モデル"
+extends Modelica.Fluid.Dissipation.Utilities.Icons.PressureLoss.Bend_i;
   extends EAST.Icons.TwoPortFlowDevice;
 
   replaceable package Medium =
@@ -57,16 +58,7 @@ equation
   annotation (
     defaultComponentName="elbo",
     Icon(
-      coordinateSystem(preserveAspectRatio=true),
-      graphics={
-        Line(
-          points={{-100,0},{0,0},{0,70},{70,70}},
-          color={0,127,255},
-          thickness=18),
-        Text(
-          extent={{-100,-45},{100,-75}},
-          textColor={0,0,255},
-          textString="%name")}),
+      coordinateSystem(preserveAspectRatio = true)),
     Documentation(info="<html>
 <p>
 指定した局所損失係数 K によりエルボ部の圧力損失を計算する、

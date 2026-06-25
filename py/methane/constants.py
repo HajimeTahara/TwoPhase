@@ -28,6 +28,8 @@ ENTRIES: list[tuple[str, str, str, str]] = [
     ("d_critical",       "Density",         "d_critical",       "臨界密度"),
     ("T_triple",         "Temperature",     "T_triple",         "三重点温度"),
     ("p_triple",         "AbsolutePressure", "p_triple",         "三重点圧力"),
+    ("T_min",            "Temperature",     "T_min",            "媒体モデルの適用下限温度"),
+    ("T_max",            "Temperature",     "T_max",            "媒体モデルの適用上限温度"),
     ("T_normal_boiling", "Temperature",     "T_normal_boiling", "常圧沸点 (101325 Pa)"),
     ("omega_const",      "Real",            "omega",            "離心因子 (CoolProp acentric, PR EOS 用)"),
     ("cp_liquid_const",  "SpecificHeatCapacity", "cp_liquid",    "飽和液の代表定圧比熱 (101325 Pa, specificEnthalpy_pT 用)"),
