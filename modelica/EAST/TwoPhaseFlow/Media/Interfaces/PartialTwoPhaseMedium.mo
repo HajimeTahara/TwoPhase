@@ -9,31 +9,39 @@ partial package PartialTwoPhaseMedium
   constant Boolean singleState = false
     "= true のとき密度・内部エネルギーが圧力に依存しない";
 
-  // 具体的流体が提供する抽象定数（値なし; extends 時に具体値を与える）
-  replaceable constant MolarMass MM_const                           "モル質量";
-  replaceable constant Temperature      T_critical                  "臨界温度";
-  replaceable constant AbsolutePressure p_critical                  "臨界圧力";
-  replaceable constant Density          d_critical                  "臨界密度";
-  replaceable constant Temperature      T_triple                    "三重点温度";
-  replaceable constant AbsolutePressure p_triple                    "三重点圧力";
-  replaceable constant Temperature      T_min                       "媒体モデルの適用下限温度";
-  replaceable constant Temperature      T_max                       "媒体モデルの適用上限温度";
-  replaceable constant Temperature      T_normal_boiling             "常圧沸点 (101325 Pa)";
-  replaceable constant Real             omega_const                  "離心因子 (Pitzer acentric factor, PR EOS 用)";
-  replaceable constant SpecificHeatCapacity cp_liquid_const            "飽和液の代表定圧比熱（specificEnthalpy_pT 近似用）";
-  replaceable constant SpecificHeatCapacity cp_vapor_const             "飽和蒸気の代表定圧比熱（specificEnthalpy_pT 近似用）";
+  // 具体的流体が提供する媒体定数（extends 時に具体値を与える）
+  replaceable constant MolarMass MM_const = 0.01604                 "モル質量";
+  replaceable constant Temperature      T_critical = 190.56         "臨界温度";
+  replaceable constant AbsolutePressure p_critical = 4.5992e6       "臨界圧力";
+  replaceable constant Density          d_critical = 162.66         "臨界密度";
+  replaceable constant Temperature      T_triple = 90.694           "三重点温度";
+  replaceable constant AbsolutePressure p_triple = 11696            "三重点圧力";
+  replaceable constant Temperature      T_min = 1                   "媒体モデルの適用下限温度";
+  replaceable constant Temperature      T_max = 10000               "媒体モデルの適用上限温度";
+  replaceable constant Temperature      T_normal_boiling = 111.66    "常圧沸点 (101325 Pa)";
+  replaceable constant Real             omega_const = 0.01142        "離心因子 (Pitzer acentric factor, PR EOS 用)";
+  replaceable constant SpecificHeatCapacity cp_liquid_const = 3500   "飽和液の代表定圧比熱（specificEnthalpy_pT 近似用）";
+  replaceable constant SpecificHeatCapacity cp_vapor_const = 2200    "飽和蒸気の代表定圧比熱（specificEnthalpy_pT 近似用）";
   replaceable constant ViscosityCoefficient mu_const
+    = 1.0e-5
     "代表粘性係数 μ（固定値）";
   replaceable constant ThermalConductivity lambda_const
+    = 0.03
     "代表熱伝導率 λ（固定値）";
 
-  replaceable constant Integer   sat_n                                   "飽和テーブル点数";
-  replaceable constant Real      sat_p[sat_n]        (each unit="Pa")    "飽和圧力グリッド";
-  replaceable constant Real      sat_T[sat_n]        (each unit="K")     "飽和温度";
-  replaceable constant Real      sat_h_bubble[sat_n] (each unit="J/kg")  "飽和液比エンタルピー";
-  replaceable constant Real      sat_h_dew[sat_n]    (each unit="J/kg")  "飽和蒸気比エンタルピー";
-  replaceable constant Real      sat_d_bubble[sat_n] (each unit="kg/m3") "飽和液密度";
-  replaceable constant Real      sat_d_dew[sat_n]    (each unit="kg/m3") "飽和蒸気密度";
+  replaceable constant Integer   sat_n = 2                               "飽和テーブル点数";
+  replaceable constant Real      sat_p[sat_n]        (each unit="Pa")
+    = {1.0e4, 1.0e6}                                                      "飽和圧力グリッド";
+  replaceable constant Real      sat_T[sat_n]        (each unit="K")
+    = {90.7, 150.0}                                                       "飽和温度";
+  replaceable constant Real      sat_h_bubble[sat_n] (each unit="J/kg")
+    = {0.0, 1.0e5}                                                        "飽和液比エンタルピー";
+  replaceable constant Real      sat_h_dew[sat_n]    (each unit="J/kg")
+    = {5.0e5, 6.0e5}                                                      "飽和蒸気比エンタルピー";
+  replaceable constant Real      sat_d_bubble[sat_n] (each unit="kg/m3")
+    = {450.0, 300.0}                                                      "飽和液密度";
+  replaceable constant Real      sat_d_dew[sat_n]    (each unit="kg/m3")
+    = {0.2, 20.0}                                                         "飽和蒸気密度";
 
   // =====================================================================
   // 型エイリアス

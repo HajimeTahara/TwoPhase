@@ -1,22 +1,20 @@
-within ModelicaProjects;
-
+within ModelicaProjects.EPv2Cooling.Component;
 model InvertorCoolingModule
   extends EAST.Icons.HexPipe;
   import Modelica.Units.SI;
-  replaceable package Medium = EAST.TwoPhaseFlow.Media.LCH_FD
-    annotation(choicesAllMatching = true);
+  parameter Integer nNode = 5 "node数. デフォルトから変更する場合スケッチも更新" annotation(
+    Dialog(group = "Module"));
+  replaceable package Medium = EAST.TwoPhaseFlow.Media.Interfaces.PartialTwoPhaseMedium annotation(
+    choicesAllMatching = true);
   parameter SI.Length module_L = 0.06 annotation(
     Dialog(tab = "Geometry", group = "Module"));
   parameter SI.Length module_W = 0.06 annotation(
     Dialog(tab = "Geometry", group = "Module"));
   parameter SI.Length module_H = 0.01 annotation(
     Dialog(tab = "Geometry", group = "Module"));
-  parameter SI.HeatFlowRate invertor_loss = 4000 "合計invertor損失" annotation(
+  parameter SI.HeatFlowRate loss = 4000 "合計invertor損失" annotation(
     Dialog(group = "Module"));
-  parameter SI.ThermalResistance R_pipe_md = 0.047+(1/(16.2*module_S/pipe_thickness)) "pipe-module間熱抵抗" annotation(
-    Dialog(group = "Module"));
-  //parameter SI.ThermalResistance R_pipe_md = 0.047+(1/(16.2*module_S/pipe_thickness));
-  parameter Integer nNode = 5 "node数. デフォルトから変更する場合スケッチも更新" annotation(
+  parameter SI.ThermalResistance R_pipe_md = 0.047 + (1/(16.2*module_S/pipe_thickness)) "pipe-module間熱抵抗" annotation(
     Dialog(group = "Module"));
   parameter SI.Length pipe_thickness = 0.005 annotation(
     Dialog(tab = "Geometry", group = "Module"));
@@ -32,7 +30,7 @@ model InvertorCoolingModule
     Dialog(group = "Material"));
   parameter EAST.Thermal.Material.MaterialProperties module_material = EAST.Thermal.Material.GeneralElecModule() annotation(
     Dialog(group = "Initialization"));
-  final parameter SI.HeatFlowRate loss_modules = invertor_loss/nNode;
+  final parameter SI.HeatFlowRate loss_modules = loss/nNode;
   final parameter SI.Area module_S = module_L*module_W;
   final parameter SI.Volume module_V = module_L*module_W*module_H;
   final parameter SI.Length total_pipe_Length = module_L*nNode;
@@ -43,8 +41,6 @@ model InvertorCoolingModule
   final parameter SI.Length pipe_W_short = pipe_H;
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow invertorLossSource annotation(
     Placement(transformation(origin = {-158, 66}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  Modelica.Blocks.Sources.Constant constLoss(k = loss_modules) annotation(
-    Placement(transformation(origin = {-216, 110}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Components.ThermalResistor res_pipe_md(R = R_pipe_md) annotation(
     Placement(transformation(origin = {-158, -20}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   EAST.Thermal.HeatTransfer.Components.HeatCapacitor module(V = module_V, material = module_material, T_start = T_init_module) annotation(
@@ -101,16 +97,12 @@ model InvertorCoolingModule
     Placement(transformation(origin = {180, -94}, extent = {{-10, -10}, {10, 10}})));
   EAST.Thermal.HeatTransfer.Components.HeatCapacitor pipe_mass4(T_start = T_init_pipe, V = pipe_massV, material = pipe_material) annotation(
     Placement(transformation(origin = {180, -54}, extent = {{-10, -10}, {10, 10}})));
-  
-  EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_a port_a(
-    redeclare package Medium = Medium,
-    p(start=p_init_pipe, nominal=1.0e5))
-    annotation (Placement(transformation(origin = {-120, -94}, extent = {{-110, -10}, {-90, 10}}), iconTransformation(extent = {{-110, -10}, {-90, 10}})));
-  EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_b port_b(
-    redeclare package Medium = Medium,
-    p(start=p_init_pipe, nominal=1.0e5))
-    annotation (Placement(transformation(origin = {138, -94}, extent = {{90, -10}, {110, 10}}), iconTransformation(extent = {{90, -10}, {110, 10}})));
-    
+  EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_a port_a(redeclare package Medium = Medium, p(start = p_init_pipe, nominal = 1.0e5)) annotation(
+    Placement(transformation(origin = {-120, -94}, extent = {{-110, -10}, {-90, 10}}), iconTransformation(extent = {{-110, -10}, {-90, 10}})));
+  EAST.TwoPhaseFlow.Component.Interfaces.FluidPort_b port_b(redeclare package Medium = Medium, p(start = p_init_pipe, nominal = 1.0e5)) annotation(
+    Placement(transformation(origin = {138, -94}, extent = {{90, -10}, {110, 10}}), iconTransformation(extent = {{90, -10}, {110, 10}})));
+  Modelica.Blocks.Interfaces.RealInput q annotation(
+    Placement(transformation(origin = {-232, 104}, extent = {{-20, -20}, {20, 20}}), iconTransformation(origin = {0, 90}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
 equation
   connect(pipe_mass.port_bottom, pipe.heatPort) annotation(
     Line(points = {{-158, -64}, {-158, -90}}, color = {191, 0, 0}));
@@ -176,21 +168,22 @@ equation
     Line(points = {{152, -54}, {170, -54}}, color = {191, 0, 0}));
   connect(cond_pipe2.port_b, pipe_mass3.port_left) annotation(
     Line(points = {{62, -54}, {86, -54}}, color = {191, 0, 0}));
-  connect(constLoss.y, invertorLossSource4.Q_flow) annotation(
-    Line(points = {{-205, 110}, {179, 110}, {179, 68}}, color = {0, 0, 127}));
-  connect(constLoss.y, invertorLossSource3.Q_flow) annotation(
-    Line(points = {{-205, 110}, {95, 110}, {95, 68}}, color = {0, 0, 127}));
-  connect(constLoss.y, invertorLossSource2.Q_flow) annotation(
-    Line(points = {{-205, 110}, {5, 110}, {5, 68}}, color = {0, 0, 127}));
-  connect(constLoss.y, invertorLossSource1.Q_flow) annotation(
-    Line(points = {{-205, 110}, {-79, 110}, {-79, 76}}, color = {0, 0, 127}));
-  connect(constLoss.y, invertorLossSource.Q_flow) annotation(
-    Line(points = {{-205, 110}, {-159, 110}, {-159, 76}}, color = {0, 0, 127}));
   connect(port_a, pipe.port_a) annotation(
     Line(points = {{-220, -94}, {-168, -94}}, color = {0, 127, 255}));
   connect(port_b, pipe4.port_b) annotation(
     Line(points = {{238, -94}, {190, -94}}, color = {0, 0, 255}));
-  annotation(experiment(StopTime = 100),
+  connect(q, invertorLossSource.Q_flow) annotation(
+    Line(points = {{-232, 104}, {-158, 104}, {-158, 76}}, color = {0, 0, 127}));
+  connect(q, invertorLossSource1.Q_flow) annotation(
+    Line(points = {{-232, 104}, {-78, 104}, {-78, 76}}, color = {0, 0, 127}));
+  connect(q, invertorLossSource2.Q_flow) annotation(
+    Line(points = {{-232, 104}, {6, 104}, {6, 68}}, color = {0, 0, 127}));
+  connect(q, invertorLossSource3.Q_flow) annotation(
+    Line(points = {{-232, 104}, {96, 104}, {96, 68}}, color = {0, 0, 127}));
+  connect(q, invertorLossSource4.Q_flow) annotation(
+    Line(points = {{-232, 104}, {180, 104}, {180, 68}}, color = {0, 0, 127}));
+  annotation(
+    experiment(StopTime = 100),
     Icon,
-  Diagram(coordinateSystem(extent = {{-260, 120}, {260, -120}})));
+    Diagram(coordinateSystem(extent = {{-260, 120}, {260, -120}})));
 end InvertorCoolingModule;

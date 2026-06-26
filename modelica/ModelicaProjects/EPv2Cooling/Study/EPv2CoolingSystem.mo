@@ -1,24 +1,22 @@
-within ModelicaProjects;
-
+within ModelicaProjects.EPv2Cooling.Study;
 model EPv2CoolingSystem
-extends Modelica.Icons.Example;
-parameter Real p_system_in=0.55*10^6"Pa";
-parameter Real p_system_out=0.1*10^6"Pa";
-parameter Real T_system_in=100"K";
-parameter Real T_system_out=100"K";
-
+  extends Modelica.Icons.Example;
+  parameter Real p_system_in = 0.55*10^6 "Pa";
+  parameter Real p_system_out = 0.1*10^6 "Pa";
+  parameter Real T_system_in = 100 "K";
+  parameter Real T_system_out = 100 "K";
   replaceable package medium = EAST.TwoPhaseFlow.Media.LCH;
-  EAST.TwoPhaseFlow.Component.Sources.Boundary_pT boundary_pT(use_p_in = true, use_T_in = true, redeclare package Medium = medium)  annotation(
+  EAST.TwoPhaseFlow.Component.Sources.Boundary_pT boundary_pT(use_p_in = true, use_T_in = true, redeclare package Medium = medium) annotation(
     Placement(transformation(origin = {-230, 120}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Blocks.Sources.Constant const(k = p_system_in)  annotation(
+  Modelica.Blocks.Sources.Constant const(k = p_system_in) annotation(
     Placement(transformation(origin = {-284, 140}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Blocks.Sources.Constant const1(k = T_system_in)  annotation(
+  Modelica.Blocks.Sources.Constant const1(k = T_system_in) annotation(
     Placement(transformation(origin = {-284, 94}, extent = {{-10, -10}, {10, 10}})));
-  EAST.TwoPhaseFlow.Component.Pipes.DynamicPipeSegment dynamicPipeSegment(redeclare package Medium = medium, use_HeatTransfer = false, p_start = p_system_in, h_start = medium.specificEnthalpy_pT(p_system_in, T_system_in))  annotation(
+  EAST.TwoPhaseFlow.Component.Pipes.DynamicPipeSegment dynamicPipeSegment(redeclare package Medium = medium, use_HeatTransfer = false, p_start = p_system_in, h_start = medium.specificEnthalpy_pT(p_system_in, T_system_in)) annotation(
     Placement(transformation(origin = {178, -134}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  EAST.TwoPhaseFlow.Component.Pumps.Pump pump(redeclare package Medium = medium)  annotation(
+  EAST.TwoPhaseFlow.Component.Pumps.Pump pump(redeclare package Medium = medium) annotation(
     Placement(transformation(origin = {92, 120}, extent = {{-10, -10}, {10, 10}})));
-  EAST.TwoPhaseFlow.Component.Valves.ValveLinear valveLinear(use_opening_in = true, redeclare package Medium = medium)  annotation(
+  EAST.TwoPhaseFlow.Component.Valves.ValveLinear valveLinear(use_opening_in = true, redeclare package Medium = medium) annotation(
     Placement(transformation(origin = {178, -84}, extent = {{10, 10}, {-10, -10}}, rotation = 90)));
   EAST.TwoPhaseFlow.Component.Sources.Boundary_pT boundary_pT2(redeclare package Medium = medium, use_T_in = true, use_p_in = true) annotation(
     Placement(transformation(origin = {298, 20}, extent = {{10, -10}, {-10, 10}})));
@@ -28,13 +26,13 @@ parameter Real T_system_out=100"K";
     Placement(transformation(origin = {378, -12}, extent = {{10, -10}, {-10, 10}})));
   EAST.TwoPhaseFlow.Component.Valves.ValveLinear valveLinear1(use_opening_in = true, redeclare package Medium = medium) annotation(
     Placement(transformation(origin = {134, -170}, extent = {{-10, -10}, {10, 10}}, rotation = -180)));
-  EAST.TwoPhaseFlow.Component.Pipes.DynamicPipeSegment dynamicPipeSegment3(redeclare package Medium = medium, use_HeatTransfer = false, p_start= p_system_in, h_start = medium.specificEnthalpy_pT(p_system_in, T_system_in)) annotation(
+  EAST.TwoPhaseFlow.Component.Pipes.DynamicPipeSegment dynamicPipeSegment3(redeclare package Medium = medium, use_HeatTransfer = false, p_start = p_system_in, h_start = medium.specificEnthalpy_pT(p_system_in, T_system_in)) annotation(
     Placement(transformation(origin = {-34, -80}, extent = {{-10, -10}, {10, 10}})));
-  EAST.TwoPhaseFlow.Component.Pipes.DynamicPipeSegment dynamicPipeSegment31(redeclare package Medium = medium, use_HeatTransfer = false, p_start= p_system_in, h_start = medium.specificEnthalpy_pT(p_system_in, T_system_in)) annotation(
+  EAST.TwoPhaseFlow.Component.Pipes.DynamicPipeSegment dynamicPipeSegment31(redeclare package Medium = medium, use_HeatTransfer = false, p_start = p_system_in, h_start = medium.specificEnthalpy_pT(p_system_in, T_system_in)) annotation(
     Placement(transformation(origin = {-38, 20}, extent = {{-10, -10}, {10, 10}})));
-  Modelica.Blocks.Sources.Constant const3(k = 1)  annotation(
+  Modelica.Blocks.Sources.Constant const3(k = 1) annotation(
     Placement(transformation(origin = {234, -84}, extent = {{10, -10}, {-10, 10}})));
-  Modelica.Blocks.Sources.Constant const31(k = 1)  annotation(
+  Modelica.Blocks.Sources.Constant const31(k = 1) annotation(
     Placement(transformation(origin = {70, -220}, extent = {{-10, -10}, {10, 10}})));
   EAST.TwoPhaseFlow.Component.Junction.TeeJunction tee1(redeclare package Medium = medium) annotation(
     Placement(transformation(origin = {-160, 20}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
@@ -42,21 +40,21 @@ parameter Real T_system_out=100"K";
     Placement(transformation(origin = {-160, -80}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   EAST.TwoPhaseFlow.Component.Junction.TeeJunction tee3(redeclare package Medium = medium) annotation(
     Placement(transformation(origin = {74, -170}, extent = {{-10, -10}, {10, 10}})));
-  EAST.TwoPhaseFlow.Component.Junction.TeeJunction tee4(redeclare package Medium = medium)  annotation(
+  EAST.TwoPhaseFlow.Component.Junction.TeeJunction tee4(redeclare package Medium = medium) annotation(
     Placement(transformation(origin = {178, 20}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  EAST.TwoPhaseFlow.Component.Junction.TeeJunction tee5(redeclare package Medium = medium)  annotation(
+  EAST.TwoPhaseFlow.Component.Junction.TeeJunction tee5(redeclare package Medium = medium) annotation(
     Placement(transformation(origin = {-160, 120}, extent = {{-10, -10}, {10, 10}}, rotation = 180)));
-  EAST.TwoPhaseFlow.Component.Pipes.StaticPipe sPipe1(redeclare package Medium = medium, frictionCorrelation = EAST.TwoPhaseFlow.Component.Pipes.FrictionCorrelation.Blasius, p_a_start = p_system_in)  annotation(
+  EAST.TwoPhaseFlow.Component.Pipes.StaticPipe sPipe1(redeclare package Medium = medium, frictionCorrelation = EAST.TwoPhaseFlow.Component.Pipes.FrictionCorrelation.Blasius, p_a_start = p_system_in) annotation(
     Placement(transformation(origin = {-48, 120}, extent = {{-10, -10}, {10, 10}})));
-  EAST.TwoPhaseFlow.Component.Pipes.StaticPipe sPipe2(redeclare package Medium = medium, p_a_start = p_system_in)  annotation(
+  EAST.TwoPhaseFlow.Component.Pipes.StaticPipe sPipe2(redeclare package Medium = medium, p_a_start = p_system_in) annotation(
     Placement(transformation(origin = {178, 74}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
-  EAST.TwoPhaseFlow.Component.Pipes.StaticPipe sPipe3(redeclare package Medium = medium, p_a_start = p_system_in)  annotation(
+  EAST.TwoPhaseFlow.Component.Pipes.StaticPipe sPipe3(redeclare package Medium = medium, p_a_start = p_system_in) annotation(
     Placement(transformation(origin = {178, -38}, extent = {{-10, -10}, {10, 10}}, rotation = -90)));
   EAST.TwoPhaseFlow.Component.Pipes.StaticPipe sPipe4(redeclare package Medium = medium, p_a_start = p_system_in) annotation(
     Placement(transformation(origin = {-32, -170}, extent = {{-10, -10}, {10, 10}})));
   EAST.TwoPhaseFlow.Component.Junction.TeeJunction tee6(redeclare package Medium = medium) annotation(
     Placement(transformation(origin = {74, -80}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
-  Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(w_fixed(displayUnit = "rpm") = 157.07963267948966)  annotation(
+  Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(w_fixed(displayUnit = "rpm") = 157.07963267948966) annotation(
     Placement(transformation(origin = {64, 160}, extent = {{-10, -10}, {10, 10}})));
 equation
   connect(const.y, boundary_pT.p_in) annotation(

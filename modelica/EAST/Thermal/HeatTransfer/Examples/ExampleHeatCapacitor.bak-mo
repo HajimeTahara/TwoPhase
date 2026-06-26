@@ -1,6 +1,7 @@
 within EAST.Thermal.HeatTransfer.Examples;
 
 model ExampleHeatCapacitor "HeatCapacitor へ一定の熱流量を与えたときの温度上昇を確認するサンプル"
+extends Modelica.Icons.Example;
   parameter Integer n=10;
   EAST.Thermal.HeatTransfer.Components.HeatCapacitor capacitor(V = 0.1^3, T_start = 293.15, material = EAST.Thermal.Material.Sus304()) "確認対象の熱容量要素"annotation(
     Placement(transformation(origin = {-60, 60}, extent = {{-10, -10}, {10, 10}})));

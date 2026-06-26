@@ -1,5 +1,4 @@
-within ModelicaProjects;
-
+within ModelicaProjects.EPv2Cooling;
 model SpeedProfile
   extends Modelica.Icons.Example;
   Modelica.Mechanics.Rotational.Sources.Speed speed(exact = false, f_crit = 5) annotation(
@@ -13,5 +12,6 @@ equation
     Line(points = {{-61, 0}, {-12, 0}}, color = {0, 0, 127}));
   connect(speed.flange, constantTorque.flange) annotation(
     Line(points = {{10, 0}, {70, 0}}));
-annotation(experiment(StopTime = 100));
+  annotation(
+    experiment(StopTime = 100));
 end SpeedProfile;
