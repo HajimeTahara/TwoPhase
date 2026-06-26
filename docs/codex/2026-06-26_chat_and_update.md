@@ -106,3 +106,165 @@
   テストモデル側で具体媒体 `EAST.TwoPhaseFlow.Media.LCH_FD` に置き換える必要があった。
 - OpenModelica 1.26.1 で `ModelicaProjects.MotorCoolingTest` の
   モデルチェックに成功した。
+
+## ElementWiseArithmetic ブロックの追加
+
+- MSL には `Math.Sum` / `Math.MultiSum` / `Math.MultiProduct` などの
+  Real配列をスカラーへ集約するブロックはあるが、2つのReal配列を要素ごとに
+  四則演算してReal配列で出力するブロックは見当たらなかった。
+- `EAST.Blocks.Math.ElementWiseArithmetic` を追加した。
+- `u1[n]` と `u2[n]` を入力し、演算タイプに応じて
+  `y[i] = u1[i] + u2[i]`、`u1[i] - u2[i]`、`u1[i]*u2[i]`、
+  `u1[i]/u2[i]` を計算する。
+- `EAST.Blocks.Types.ArithmeticOperation` を追加し、`Add`、`Subtract`、
+  `Multiply`、`Divide` を選択できるようにした。
+- `EAST.Blocks.Math.package.order` と `EAST.Blocks.Types.package.order` に
+  新規エンティティを登録した。
+- OpenModelica 1.26.1 で単体、および `ConstantArray` 2つを接続した
+  確認モデルのモデルチェックに成功した。
+
+## VectorScalarArithmetic ブロックの追加
+
+- `EAST.Blocks.Math.ElementWiseArithmetic` は残したまま、
+  Real配列とスカラー入力の乗算・除算用ブロックを追加した。
+- `EAST.Blocks.Math.VectorScalarArithmetic` を追加した。
+- `u[n]` とスカラー入力 `k` を受け取り、演算タイプに応じて
+  `y[i] = u[i]*k` または `y[i] = u[i]/k` を計算する。
+- `EAST.Blocks.Types.VectorScalarOperation` を追加し、`Multiply` と
+  `Divide` を選択できるようにした。
+- `EAST.Blocks.Math.package.order` と `EAST.Blocks.Types.package.order` に
+  新規エンティティを登録した。
+- OpenModelica 1.26.1 で単体、および `ConstantArray` と
+  `Modelica.Blocks.Sources.Constant` を接続した確認モデルの
+  モデルチェックに成功した。
+
+## EPv2Cooling MotorCoolingModule の VectorScalarArithmetic 次元修正
+
+- `ModelicaProjects.EPv2Cooling.Component.MotorCoolingModule` の
+  `VectorScalarArithmetic` インスタンスに `n = 3` を設定した。
+- `VectorScalarArithmetic` の既定 `n` は1であり、`y[1]` を
+  `CylindricalThermalConductor.Q_gen_input[3]` に接続しようとして
+  connector 型不一致になっていた。
+- OpenModelica 1.26.1 で
+  `ModelicaProjects.EPv2Cooling.Component.MotorCoolingModule` と
+  `ModelicaProjects.EPv2Cooling.Study.MotorCoolingTest` の
+  モデルチェックに成功した。
+
+## CylindricalThermalConductor の層温度出力追加
+
+- `EAST.Thermal.HeatTransfer.Components.CylindricalThermalConductor` に
+  `RealOutput layerTemperature[nLayers]` を追加した。
+- 既存の各層代表温度状態 `T[i]` を `layerTemperature[i]` へ出力する。
+- 出力には `quantity="ThermodynamicTemperature"`、`unit="K"`、
+  `displayUnit="degC"` を設定した。
+- OpenModelica 1.26.1 で
+  `EAST.Thermal.HeatTransfer.Components.CylindricalThermalConductor` と
+  `ModelicaProjects.EPv2Cooling.Study.MotorCoolingTest` の
+  モデルチェックに成功した。
+
+## CylindricalThermalConductor の層温度出力オプション化
+
+- `EAST.Thermal.HeatTransfer.Components.CylindricalThermalConductor` に
+  構造パラメータ `use_temperature_output` を追加した。
+- `use_temperature_output=true` の場合のみ
+  `RealOutput layerTemperature[nLayers]` を有効化する。
+- 既定値は `false` とし、既存モデルでは温度出力コネクタを生成しない。
+- OpenModelica 1.26.1 で単体、温度出力を有効化して
+  `MultiSum` に接続した確認モデル、および
+  `ModelicaProjects.EPv2Cooling.Study.MotorCoolingTest` の
+  モデルチェックに成功した。
+
+## SegmentedCylindricalThermalConductor の層・ノード温度出力オプション追加
+
+- `EAST.Thermal.HeatTransfer.Components.SegmentedCylindricalThermalConductor` に
+  構造パラメータ `use_temperature_output` を追加した。
+- `use_temperature_output=true` の場合のみ
+  `RealOutput layerTemperature[nLayers, nNode]` を有効化する。
+- 既存の各層・各ノード代表温度状態 `T[i, j]` を
+  `layerTemperature[i, j]` へ出力する。
+- 既定値は `false` とし、既存モデルでは温度出力コネクタを生成しない。
+- OpenModelica 1.26.1 で単体、および温度出力を有効化して
+  `layerTemperature[1,1]` と `layerTemperature[3,2]` を接続した
+  確認モデルのモデルチェックに成功した。
+
+## ExtractScalar ブロックの追加
+
+- MSL には `Modelica.Blocks.Routing.Extractor` があり、
+  `IntegerInput index` によってReal配列からスカラーを動的に抽出できる。
+- EAST側には、パラメータ `index` で抽出要素を固定指定する
+  `EAST.Blocks.Routing.ExtractScalar` を追加した。
+- `u[n]` から `u[index]` を取り出し、スカラーReal出力 `y` として出力する。
+- `EAST.Blocks.Routing.package.order` を追加し、新規エンティティを登録した。
+- OpenModelica 1.26.1 で単体、および `ConstantArray` から2番目の要素を
+  抽出する確認モデルのモデルチェックに成功した。
+
+## ElementWiseAdd ブロックの追加と MotorCoolingModule の単位警告対応
+
+- `EAST.Blocks.Math.ElementWiseArithmetic` は四則演算を1つの条件式で切り替えるため、
+  温度配列を接続した場合に未使用の乗算・除算分岐まで単位検査され、
+  `K2` や `1` が混在する警告が出ていた。
+- 温度など単位付き信号の加算・減算用として
+  `EAST.Blocks.Math.ElementWiseAdd` を追加した。
+- `ElementWiseAdd` は `y[i] = k1*u1[i] + k2*u2[i]` のみを計算し、
+  `k2=-1` によって差分計算にも使える。
+- `ModelicaProjects.EPv2Cooling.Component.MotorCoolingModule` の温度平均計算で使っていた
+  `ElementWiseArithmetic(operation=Add)` を `ElementWiseAdd` に差し替えた。
+- OpenModelica 1.26.1 で `ElementWiseAdd`、
+  `ModelicaProjects.EPv2Cooling.Component.MotorCoolingModule`、
+  `ModelicaProjects.EPv2Cooling.Study.MotorCoolingTest` の
+  モデルチェックに成功し、該当の単位警告が出ないことを確認した。
+
+## ElementWiseArithmetic の削除と要素別四則演算ブロックへの分離
+
+- 条件式で四則演算を切り替える `EAST.Blocks.Math.ElementWiseArithmetic` を削除した。
+- それに伴い、専用列挙型 `EAST.Blocks.Types.ArithmeticOperation` も削除した。
+- 単位検査で未使用分岐の単位混在を避けるため、四則演算を次の個別ブロックに分離した。
+  - `EAST.Blocks.Math.ElementWiseAdd`
+  - `EAST.Blocks.Math.ElementWiseSubtract`
+  - `EAST.Blocks.Math.ElementWiseMultiply`
+  - `EAST.Blocks.Math.ElementWiseDivide`
+- `ElementWiseSubtract` は `y[i] = k1*u1[i] - k2*u2[i]`、
+  `ElementWiseMultiply` は `y[i] = k*u1[i]*u2[i]`、
+  `ElementWiseDivide` は `y[i] = k*u1[i]/u2[i]` を計算する。
+- `EAST.Blocks.Math.package.order` と `EAST.Blocks.Types.package.order` を更新した。
+- OpenModelica 1.26.1 で各ブロック単体、4演算を接続した確認モデル、
+  および `ModelicaProjects.EPv2Cooling.Study.MotorCoolingTest` の
+  モデルチェックに成功した。
+
+## パラメータ相手のスカラー四則演算ブロック追加
+
+- MSL の `Modelica.Blocks.Math.Division` は2入力の除算ブロックであり、
+  片方の演算対象をパラメータ化した1入力ブロックはそのままでは見当たらなかった。
+- `EAST.Blocks.Math` に、Real入力1つとパラメータ `k` で四則演算する
+  スカラー演算ブロックを追加した。
+  - `AddParameter`: `y = u + k`
+  - `SubtractParameter`: `y = u - k`
+  - `MultiplyParameter`: `y = u*k`
+  - `DivideParameter`: `y = u/k`
+- 単位検査で未使用分岐が混ざらないよう、四則演算を1つの条件式ブロックにまとめず、
+  演算ごとに別ブロックとして追加した。
+- `EAST.Blocks.Math.package.order` に新規エンティティを登録した。
+- OpenModelica 1.26.1 で4ブロック単体、および4ブロックを直列接続した
+  確認モデルのモデルチェックに成功した。
+
+## UnitConvert パッケージと rpm/rad 変換ブロック追加
+
+- `EAST.Blocks.UnitConvert` パッケージを追加した。
+- `EAST.Blocks.UnitConvert.RpmToRad` を追加し、rpm（rev/min）から
+  rad/s へ変換するようにした。
+- `EAST.Blocks.UnitConvert.RadToRpm` を追加し、rad/s から
+  rpm（rev/min）へ変換するようにした。
+- 変換式は MSL の `Modelica.Units.Conversions.from_rpm` /
+  `to_rpm` を使用した。
+- `EAST.Blocks.package.order` と `EAST.Blocks.UnitConvert.package.order` を更新した。
+- OpenModelica 1.26.1 で2ブロック単体、および rpm→rad/s→rpm の
+  往復接続確認モデルのモデルチェックに成功した。
+
+## EPv2Cooling Real3ToArray ブロック追加
+
+- `ModelicaProjects.EPv2Cooling.Real3ToArray` を追加した。
+- 3つのReal入力 `u1`、`u2`、`u3` を受け取り、Real配列出力
+  `y[3] = {u1, u2, u3}` として出力する。
+- `ModelicaProjects.EPv2Cooling.package.order` に新規エンティティを登録した。
+- OpenModelica 1.26.1 で単体、および3つの `Constant` と
+  `ExtractScalar` を接続した確認モデルのモデルチェックに成功した。

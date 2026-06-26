@@ -1,2 +1,11 @@
+ElementWiseAdd
+ElementWiseSubtract
+ElementWiseMultiply
+ElementWiseDivide
+AddParameter
+SubtractParameter
+MultiplyParameter
+DivideParameter
 Polynomial
 PolynomialArray
+VectorScalarArithmetic

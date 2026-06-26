@@ -11,6 +11,9 @@ model CylindricalThermalConductor "材料物性と多層円筒形状から半径
   parameter Boolean use_heat_input = false
     "true: 外部入力 Q_gen_input、false: 固定値 Q_gen を使用" annotation(
     Evaluate = true);
+  parameter Boolean use_temperature_output = false
+    "true: 各層温度出力を使用" annotation(
+    Evaluate = true);
   parameter Modelica.Units.SI.HeatFlowRate Q_gen[nLayers] = fill(0, nLayers)
     "各層の固定内部発熱量（正: 加熱）" annotation(
     Dialog(enable = not use_heat_input));
@@ -28,6 +31,12 @@ model CylindricalThermalConductor "材料物性と多層円筒形状から半径
   Modelica.Units.SI.HeatFlowRate Q_between[nInterfaces] "層 i から i+1 へ流れる熱流量 [W]";
   Modelica.Blocks.Interfaces.RealInput Q_gen_input[nLayers](each final quantity = "HeatFlowRate", each final unit = "W") if use_heat_input "各層の内部発熱量入力 [W]（正: 加熱）" annotation(
     Placement(transformation(origin = {-110, 120}, extent = {{-20, 90}, {20, 130}}, rotation = -90), iconTransformation(origin = {-110, 120}, extent = {{-20, 90}, {20, 130}}, rotation = -90)));
+  Modelica.Blocks.Interfaces.RealOutput layerTemperature[nLayers](
+    each final quantity = "ThermodynamicTemperature",
+    each final unit = "K",
+    each displayUnit = "degC") if use_temperature_output
+    "各層の代表温度出力" annotation(
+    Placement(transformation(origin = {20, 120}, extent = {{-20, 90}, {20, 130}}, rotation = 90), iconTransformation(origin = {30, 120}, extent = {{-20, 90}, {20, 130}}, rotation = 90)));
   EAST.Thermal.HeatTransfer.Interfaces.HeatPort_a port_inner "内側熱ポート" annotation(
     Placement(transformation(extent = {{-110, -10}, {-90, 10}}), iconTransformation(extent = {{-110, -10}, {-90, 10}})));
   EAST.Thermal.HeatTransfer.Interfaces.HeatPort_b port_outer "外側熱ポート" annotation(
@@ -45,6 +54,11 @@ equation
   for i in 1:nLayers loop
     Q_gen_internal[i] = if use_heat_input then Q_gen_input[i] else Q_gen[i];
   end for;
+  if use_temperature_output then
+    for i in 1:nLayers loop
+      layerTemperature[i] = T[i];
+    end for;
+  end if;
   port_inner.Q_flow = G_innerHalf[1]*(port_inner.T - T[1]);
   for i in 1:nInterfaces loop
     Q_between[i] = G_between[i]*(T[i] - T[i + 1]);
@@ -88,6 +102,10 @@ equation
 各層の熱容量代表半径は幾何平均半径
 <code>sqrt(r_inner*r_outer)</code> とし、各層を内側半分・外側半分の熱抵抗に分割して
 隣接層と接続しています。
+</p>
+<p>
+<code>use_temperature_output=true</code> の場合、各層の代表温度は
+<code>layerTemperature[i]</code> からReal信号として出力できます。
 </p>
 <p>
 内部の未接続 HeatPort は使用せず、各層について次の形式の収支を直接計算します。

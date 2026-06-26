@@ -13,6 +13,9 @@ model SegmentedCylindricalThermalConductor "材料物性と多層円筒形状か
   parameter Boolean use_heat_input = false
     "true: 外部入力 Q_gen_input、false: 固定値 Q_gen を使用" annotation(
     Evaluate = true);
+  parameter Boolean use_temperature_output = false
+    "true: 各層・各ノード温度出力を使用" annotation(
+    Evaluate = true);
   parameter Modelica.Units.SI.HeatFlowRate Q_gen[nLayers, nNode] =
     fill(0, nLayers, nNode)
     "各層・各ノードの固定内部発熱量（正: 加熱）" annotation(
@@ -36,6 +39,12 @@ model SegmentedCylindricalThermalConductor "材料物性と多層円筒形状か
   Modelica.Units.SI.HeatFlowRate Q_axial[nLayers, nAxialInterfaces] "ノード j から j+1 へ流れる長さ方向熱流量 [W]";
   Modelica.Blocks.Interfaces.RealInput Q_gen_input[nLayers, nNode](each final quantity = "HeatFlowRate", each final unit = "W") if use_heat_input "各層・各ノードの内部発熱量入力 [W]（正: 加熱）" annotation(
     Placement(transformation(origin = {-110, 120}, extent = {{-20, 90}, {20, 130}}, rotation = -90), iconTransformation(origin = {-110, 120}, extent = {{-20, 90}, {20, 130}}, rotation = -90)));
+  Modelica.Blocks.Interfaces.RealOutput layerTemperature[nLayers, nNode](
+    each final quantity = "ThermodynamicTemperature",
+    each final unit = "K",
+    each displayUnit = "degC") if use_temperature_output
+    "各層・各ノードの代表温度出力" annotation(
+    Placement(transformation(origin = {110, 120}, extent = {{-20, 90}, {20, 130}}, rotation = 90), iconTransformation(origin = {110, 120}, extent = {{-20, 90}, {20, 130}}, rotation = 90)));
   EAST.Thermal.HeatTransfer.Interfaces.HeatPort_a port_inner[nNode] "内側熱ポート（軸方向ノードごと）" annotation(
     Placement(transformation(extent = {{-110, -10}, {-90, 10}}), iconTransformation(extent = {{-110, -10}, {-90, 10}})));
   EAST.Thermal.HeatTransfer.Interfaces.HeatPort_b port_outer[nNode] "外側熱ポート（軸方向ノードごと）" annotation(
@@ -55,6 +64,13 @@ equation
       Q_gen_internal[i, j] = if use_heat_input then Q_gen_input[i, j] else Q_gen[i, j];
     end for;
   end for;
+  if use_temperature_output then
+    for i in 1:nLayers loop
+      for j in 1:nNode loop
+        layerTemperature[i, j] = T[i, j];
+      end for;
+    end for;
+  end if;
   for j in 1:nNode loop
     port_inner[j].Q_flow = G_innerHalf[1]*(port_inner[j].T - T[1, j]);
     port_outer[j].Q_flow = G_outerHalf[nLayers]*(port_outer[j].T - T[nLayers, j]);
@@ -107,6 +123,10 @@ equation
 <p>
 <code>Q_gen[i, j]</code> は層 i・ノード j に流入する内部発熱量 [W] です。正の値は加熱します。
 <code>use_heat_input=true</code> の場合は、外部入力 <code>Q_gen_input[i, j]</code> が優先されます。
+</p>
+<p>
+<code>use_temperature_output=true</code> の場合、各層・各ノードの代表温度は
+<code>layerTemperature[i, j]</code> からReal信号として出力できます。
 </p>
 </html>"),
     Diagram(graphics));
