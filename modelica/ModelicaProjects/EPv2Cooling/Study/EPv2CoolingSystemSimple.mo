@@ -70,7 +70,7 @@ model EPv2CoolingSystemSimple
   EAST.Blocks.Math.Polynomial pnLCHflow(a0 = 0, a1 = 0.0009, a2 = 3E-11, polynomialType = EAST.Blocks.Types.PolynomialType.Quadratic) annotation(
          HideResult = true,
     Placement(transformation(origin = {-216, -316}, extent = {{-10, -10}, {10, 10}})));
-  EAST.Blocks.Math.MultiplyParameter multiplyParameter21(k = 420*0.01) annotation(
+  EAST.Blocks.Math.MultiplyParameter multiplyParameter21(k = 420*0.06) annotation(
          HideResult = true,
     Placement(transformation(origin = {-158, -316}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Nonlinear.Limiter limiter1(uMax = 1e+10, uMin = 0.03) annotation(

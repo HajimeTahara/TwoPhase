@@ -153,43 +153,61 @@ model InvertorCoolingModuleWithHeater
     HideResult = true,
     Placement(transformation(origin = {-410, 60}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow heaterSource annotation(
+    HideResult = true,
     Placement(transformation(origin = {-348, 30}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow heaterSource1 annotation(
+    HideResult = true,
     Placement(transformation(origin = {-190, 30}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow heaterSource2 annotation(
+    HideResult = true,
     Placement(transformation(origin = {-30, 30}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow heaterSource3 annotation(
+    HideResult = true,
     Placement(transformation(origin = {102, 30}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Sources.PrescribedHeatFlow heaterSource4 annotation(
     HideResult = true,
     Placement(transformation(origin = {234, 32}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Sensors.TemperatureSensor temperatureSensor annotation(
+    HideResult = true,
     Placement(transformation(origin = {-290, 30}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Tables.CombiTable1Ds combiTable1Ds(table = heaterTable) annotation(
+    HideResult = true,
     Placement(transformation(origin = {-350, -50}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Routing.ExtractScalar extractScalar annotation(
+    HideResult = true,
     Placement(transformation(origin = {-390, -50}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Blocks.Tables.CombiTable1Ds combiTable1Ds1(table = heaterTable) annotation(
+    HideResult = true,
     Placement(transformation(origin = {-170, -50}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Routing.ExtractScalar extractScalar1 annotation(
+    HideResult = true,
     Placement(transformation(origin = {-210, -50}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Thermal.HeatTransfer.Sensors.TemperatureSensor temperatureSensor1 annotation(
+    HideResult = true,
     Placement(transformation(origin = {-130, 30}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Sensors.TemperatureSensor temperatureSensor2 annotation(
+    HideResult = true,
     Placement(transformation(origin = {30, 30}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Sensors.TemperatureSensor temperatureSensor3 annotation(
+    HideResult = true,
     Placement(transformation(origin = {168, 30}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Thermal.HeatTransfer.Sensors.TemperatureSensor temperatureSensor4 annotation(
+    HideResult = true,
     Placement(transformation(origin = {316, 32}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Tables.CombiTable1Ds combiTable1Ds2(table = heaterTable) annotation(
+    HideResult = true,
     Placement(transformation(origin = {-10, -50}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Routing.ExtractScalar extractScalar2 annotation(
+    HideResult = true,
     Placement(transformation(origin = {-50, -50}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Blocks.Tables.CombiTable1Ds combiTable1Ds3(table = heaterTable) annotation(
+    HideResult = true,
     Placement(transformation(origin = {130, -50}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Routing.ExtractScalar extractScalar3 annotation(
+    HideResult = true,
     Placement(transformation(origin = {90, -50}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Blocks.Tables.CombiTable1Ds combiTable1Ds4(table = heaterTable) annotation(
+    HideResult = true,
     Placement(transformation(origin = {270, -50}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Routing.ExtractScalar extractScalar4 annotation(
     HideResult = true,

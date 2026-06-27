@@ -28,6 +28,12 @@ partial package PartialTwoPhaseMedium
   replaceable constant ThermalConductivity lambda_const
     = 0.03
     "代表熱伝導率 λ（固定値）";
+  constant Boolean usePhaseBoundarySmoothBlend = false
+    "true のとき単相/二相境界で密度と温度を滑らかに接続する";
+  constant Real phaseBoundaryDensityBlendFraction(unit="1") = 0.01
+    "単相/二相境界で物性を滑らかに接続する比エンタルピー幅の潜熱比";
+  constant SpecificEnthalpy phaseBoundaryDensityBlendMinWidth = 10000
+    "単相/二相境界で物性を滑らかに接続する最小比エンタルピー幅";
 
   replaceable constant Integer   sat_n = 2                               "飽和テーブル点数";
   replaceable constant Real      sat_p[sat_n]        (each unit="Pa")
@@ -226,36 +232,134 @@ partial package PartialTwoPhaseMedium
   end vapourQuality;
 
   function density
-    "密度を返す [kg/m³]（二相: 混合密度式; 単相: densitySinglePhase に委譲）"
+    "密度を返す [kg/m³]（単相/二相境界では滑らかに接続）"
     input  ThermodynamicState state;
     output Density            d;
   protected
     SaturationProperties sat;
+    SpecificEnthalpy hBlend;
+    Real xRaw;
     Real x;
+    Real w;
+    Density dTwoPhase;
+    Density dSinglePhaseBoundary;
   algorithm
-    if state.phase == 2 then
-      sat := setSat_p(state.p);
-      x   := max(0.0, min(1.0,
-               (state.h - sat.h_bubble) / (sat.h_dew - sat.h_bubble)));
-      // HEM 混合密度: 1/d = x/ρv + (1-x)/ρl
-      d := 1.0 / (x / sat.d_dew + (1.0 - x) / sat.d_bubble);
+    // 変更前の実装:
+    // if state.phase == 2 then
+    //   sat := setSat_p(state.p);
+    //   x   := max(0.0, min(1.0,
+    //            (state.h - sat.h_bubble) / (sat.h_dew - sat.h_bubble)));
+    //   // HEM 混合密度: 1/d = x/ρv + (1-x)/ρl
+    //   d := 1.0 / (x / sat.d_dew + (1.0 - x) / sat.d_bubble);
+    // else
+    //   d := densitySinglePhase(state.p, state.h);
+    // end if;
+
+    if not usePhaseBoundarySmoothBlend then
+      if state.phase == 2 then
+        sat := setSat_p(state.p);
+        x := max(0.0, min(1.0,
+               (state.h - sat.h_bubble)/(sat.h_dew - sat.h_bubble)));
+        // HEM 混合密度: 1/d = x/ρv + (1-x)/ρl
+        d := 1.0/(x/sat.d_dew + (1.0 - x)/sat.d_bubble);
+      else
+        d := densitySinglePhase(state.p, state.h);
+      end if;
     else
-      d := densitySinglePhase(state.p, state.h);
+      sat := setSat_p(state.p);
+      hBlend := max(
+        phaseBoundaryDensityBlendMinWidth,
+        phaseBoundaryDensityBlendFraction*(sat.h_dew - sat.h_bubble));
+      xRaw := (state.h - sat.h_bubble)/(sat.h_dew - sat.h_bubble);
+      x := max(0.0, min(1.0, xRaw));
+      // HEM 混合密度: 1/d = x/ρv + (1-x)/ρl
+      dTwoPhase := 1.0/(x/sat.d_dew + (1.0 - x)/sat.d_bubble);
+
+      if state.h < sat.h_bubble - hBlend then
+        d := densitySinglePhase(state.p, state.h);
+      elseif state.h < sat.h_bubble + hBlend then
+        dSinglePhaseBoundary :=
+          densitySinglePhase(state.p, min(state.h, sat.h_bubble));
+        w := smoothStep(
+          (state.h - (sat.h_bubble - hBlend))/(2.0*hBlend));
+        d := (1.0 - w)*dSinglePhaseBoundary + w*dTwoPhase;
+      elseif state.h <= sat.h_dew - hBlend then
+        d := dTwoPhase;
+      elseif state.h <= sat.h_dew + hBlend then
+        dSinglePhaseBoundary :=
+          densitySinglePhase(state.p, max(state.h, sat.h_dew));
+        w := smoothStep(
+          (state.h - (sat.h_dew - hBlend))/(2.0*hBlend));
+        d := (1.0 - w)*dTwoPhase + w*dSinglePhaseBoundary;
+      else
+        d := densitySinglePhase(state.p, state.h);
+      end if;
     end if;
   end density;
 
+  function smoothStep
+    "0から1の範囲を3次多項式で滑らかに接続する"
+    input Real u(unit="1");
+    output Real y(unit="1");
+  protected
+    Real uc(unit="1");
+  algorithm
+    uc := max(0.0, min(1.0, u));
+    y := uc*uc*(3.0 - 2.0*uc);
+  end smoothStep;
+
   function temperature
-    "温度を返す [K]（二相: 飽和温度; 単相: temperatureSinglePhase に委譲）"
+    "温度を返す [K]（単相/二相境界では滑らかに接続）"
     input  ThermodynamicState state;
     output Temperature        T;
   protected
     SaturationProperties sat;
+    SpecificEnthalpy hBlend;
+    Real w;
+    Temperature TTwoPhase;
+    Temperature TSinglePhaseBoundary;
   algorithm
-    if state.phase == 2 then
-      sat := setSat_p(state.p);
-      T   := sat.Tsat;
+    // 変更前の実装:
+    // if state.phase == 2 then
+    //   sat := setSat_p(state.p);
+    //   T   := sat.Tsat;
+    // else
+    //   T := temperatureSinglePhase(state.p, state.h);
+    // end if;
+
+    if not usePhaseBoundarySmoothBlend then
+      if state.phase == 2 then
+        sat := setSat_p(state.p);
+        T := sat.Tsat;
+      else
+        T := temperatureSinglePhase(state.p, state.h);
+      end if;
     else
-      T := temperatureSinglePhase(state.p, state.h);
+      sat := setSat_p(state.p);
+      hBlend := max(
+        phaseBoundaryDensityBlendMinWidth,
+        phaseBoundaryDensityBlendFraction*(sat.h_dew - sat.h_bubble));
+      TTwoPhase := sat.Tsat;
+
+      if state.h < sat.h_bubble - hBlend then
+        T := temperatureSinglePhase(state.p, state.h);
+      elseif state.h < sat.h_bubble + hBlend then
+        TSinglePhaseBoundary :=
+          temperatureSinglePhase(state.p, min(state.h, sat.h_bubble));
+        w := smoothStep(
+          (state.h - (sat.h_bubble - hBlend))/(2.0*hBlend));
+        T := (1.0 - w)*TSinglePhaseBoundary + w*TTwoPhase;
+      elseif state.h <= sat.h_dew - hBlend then
+        T := TTwoPhase;
+      elseif state.h <= sat.h_dew + hBlend then
+        TSinglePhaseBoundary :=
+          temperatureSinglePhase(state.p, max(state.h, sat.h_dew));
+        w := smoothStep(
+          (state.h - (sat.h_dew - hBlend))/(2.0*hBlend));
+        T := (1.0 - w)*TTwoPhase + w*TSinglePhaseBoundary;
+      else
+        T := temperatureSinglePhase(state.p, state.h);
+      end if;
     end if;
   end temperature;
 

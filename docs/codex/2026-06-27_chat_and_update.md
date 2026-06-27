@@ -88,3 +88,33 @@
 
 - OpenModelicaで該当モデルを再シミュレーションし、
   非線形連立の収束状況を確認する。
+
+---
+
+## 単相/二相境界の密度ブレンド追加
+
+### 議題
+
+- 低流量時に冷却管内の状態が単相/二相境界をまたぎ、
+  `density()`の単相密度と二相HEM密度の切り替わりで非線形連立が悪条件になる可能性がある。
+
+### 決定事項
+
+- `PartialTwoPhaseMedium.density()`で、飽和液境界および飽和蒸気境界の近傍だけ
+  単相密度と二相HEM密度を3次smooth stepでブレンドする。
+- ブレンド幅は潜熱幅の`1%`、ただし最小`100 J/kg`とする。
+- 変更前の硬い`if state.phase == 2 then ... else ...`実装は、
+  比較用にコメントアウトして残す。
+
+### 変更ファイル
+
+- `modelica/EAST/TwoPhaseFlow/Media/Interfaces/PartialTwoPhaseMedium.mo`
+- `docs/codex/2026-06-27_chat_and_update.md`
+
+### 変更理由
+
+- 単相/二相境界で密度が急に切り替わることによるNewton反復の発散を抑えるため。
+
+### 残作業
+
+- OpenModelicaで低流量・相境界通過時の収束性と密度の連続性を確認する。
