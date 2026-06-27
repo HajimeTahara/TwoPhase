@@ -67,8 +67,8 @@ model DynamicPipeSegment "動的管セグメント（単一 well-mixed 制御容
     "外部熱源側の境界温度と熱流を受け取るポート" annotation(
     Placement(transformation(extent = {{-10, 40}, {10, 60}}), iconTransformation(origin = {0, -6}, extent = {{-10, 40}, {10, 60}})));
   // 状態変数（CV: このセグメントの容積 V に蓄えられた流体の代表状態）
-  Modelica.Units.SI.AbsolutePressure p(start = p_start) "CV 内圧力 [Pa]（状態変数; port_a.p と一致）";
-  Modelica.Units.SI.SpecificEnthalpy h(start = h_start) "CV 内比エンタルピー [J/kg]（状態変数; port_b.h_outflow と一致）";
+  Modelica.Units.SI.AbsolutePressure p(start = p_start, nominal = 1.0e5) "CV 内圧力 [Pa]（状態変数; port_a.p と一致）";
+  Modelica.Units.SI.SpecificEnthalpy h(start = h_start, nominal = 1.0e5) "CV 内比エンタルピー [J/kg]（状態変数; port_b.h_outflow と一致）";
   // 蓄積量
   Modelica.Units.SI.Mass M "CV内の流体質量 [kg]";
   Modelica.Units.SI.Energy U "CV内の流体内部エネルギー [J]";

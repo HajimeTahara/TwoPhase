@@ -9,56 +9,88 @@ model ProfileGenerator
   parameter Real rpm_to_torque_a2 = 0.3092;//0.287
   parameter Real rpm_to_torque_a1 = -7e-15;//7e-15
   parameter Real eff_motor = 0.95;
+  
+  Modelica.Units.SI.Torque indicated_torque;
+  Modelica.Units.SI.Voltage indicated_invertorV;
+  Modelica.Units.SI.Current indicated_invertorI;  
+  Modelica.Units.SI.Power pump_power;
+  
   EAST.Blocks.Math.DivideParameter divideParameter1(k = 10000) annotation(
+    HideResult = true,
     Placement(transformation(origin = {270, 112}, extent = {{10, -10}, {-10, 10}})));
-  EAST.Blocks.Math.Polynomial pnLOXtorque(a0 = 0, a1 = rpm_to_torque_a1, a2 = rpm_to_torque_a2, polynomialType = EAST.Blocks.Types.PolynomialType.Quadratic) annotation(
+  EAST.Blocks.Math.Polynomial pnTorque(a0 = 0, a1 = rpm_to_torque_a1, a2 = rpm_to_torque_a2, polynomialType = EAST.Blocks.Types.PolynomialType.Quadratic) annotation(
+    HideResult = true,
     Placement(transformation(origin = {222, 112}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Blocks.Math.Product product1 annotation(
+    HideResult = true,
     Placement(transformation(origin = {142, 106}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.UnitConvert.RpmToRad rpmToRad1 annotation(
+    HideResult = true,
     Placement(transformation(origin = {246, 74}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Math.DivideParameter divideParameter2(k = torque_const) annotation(
+    HideResult = true,
     Placement(transformation(origin = {172, 22}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Math.DivideParameter divideParameter21(k = power_factor) annotation(
+    HideResult = true,
     Placement(transformation(origin = {36, 6}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Math.MultiplyParameter multiplyParameter(k = coil_resist) annotation(
+    HideResult = true,
     Placement(transformation(origin = {-14, 6}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Math.MultiplyParameter multiplyParameter1(k = sqrt(3)/sqrt(2)) annotation(
+    HideResult = true,
     Placement(transformation(origin = {-60, 6}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Math.MultiplyParameter multiplyParameter11(k = sqrt(3)/sqrt(2)) annotation(
+    HideResult = true,
     Placement(transformation(origin = {-62, -98}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Math.MultiplyParameter multiplyParameter2(k = dq_inductance) annotation(
+    HideResult = true,
     Placement(transformation(origin = {-16, -98}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Math.MultiplyParameter multiplyParameter12(k = torque_const) annotation(
+    HideResult = true,
     Placement(transformation(origin = {-16, 58}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Blocks.Math.Product product111 annotation(
+    HideResult = true,
     Placement(transformation(origin = {-150, -92}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Blocks.Math.Add add annotation(
+    HideResult = true,
     Placement(transformation(origin = {-174, 28}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Blocks.Math.Add add1 annotation(
+    HideResult = true,
     Placement(transformation(origin = {-210, -10}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Blocks.Interfaces.RealInput u annotation(
+    HideResult = true,
     Placement(transformation(origin = {358, 112}, extent = {{20, -20}, {-20, 20}}), iconTransformation(origin = {-120, 0}, extent = {{-20, -20}, {20, 20}})));
   Modelica.Blocks.Interfaces.RealOutput invertorLoss annotation(
+    HideResult = true,
     Placement(transformation(origin = {-288, 124}, extent = {{10, -10}, {-10, 10}}), iconTransformation(origin = {110, 42}, extent = {{-10, -10}, {10, 10}})));
   EAST.Blocks.Math.DivideParameter divideParameter211(k = eff_invertor) annotation(
+    HideResult = true,
     Placement(transformation(origin = {-92, 106}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Blocks.Math.Add add11(k1 = -1) annotation(
+    HideResult = true,
     Placement(transformation(origin = {-214, 124}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Blocks.Interfaces.RealOutput motorLoss annotation(
+    HideResult = true,
     Placement(transformation(origin = {-292, 186}, extent = {{10, -10}, {-10, 10}}), iconTransformation(origin = {110, -40}, extent = {{-10, -10}, {10, 10}})));
   EAST.Blocks.Math.MultiplyParameter multiplyParameter121(k = 1 - eff_motor) annotation(
+    HideResult = true,
     Placement(transformation(origin = {-98, 186}, extent = {{10, -10}, {-10, 10}})));
   EAST.Blocks.Math.DivideParameter divideParameter2111(k = eff_motor) annotation(
+    HideResult = true,
     Placement(transformation(origin = {44, 106}, extent = {{10, -10}, {-10, 10}})));
 equation
-  connect(pnLOXtorque.u, divideParameter1.y) annotation(
+  indicated_torque = pnTorque.y;
+  pump_power = product1.y;
+  indicated_invertorI=divideParameter2.y;
+  indicated_invertorV=add1.y;
+  
+  connect(pnTorque.u, divideParameter1.y) annotation(
     Line(points = {{234, 112}, {259, 112}}, color = {0, 0, 127}));
-  connect(product1.u1, pnLOXtorque.y) annotation(
+  connect(product1.u1, pnTorque.y) annotation(
     Line(points = {{154, 112}, {212, 112}}, color = {0, 0, 127}));
   connect(product1.u2, rpmToRad1.y) annotation(
     Line(points = {{154, 100}, {186, 100}, {186, 74}, {236, 74}}, color = {0, 0, 127}));
-  connect(divideParameter2.u, pnLOXtorque.y) annotation(
+  connect(divideParameter2.u, pnTorque.y) annotation(
     Line(points = {{184, 22}, {198, 22}, {198, 112}, {212, 112}}, color = {0, 0, 127}));
   connect(divideParameter21.u, divideParameter2.y) annotation(
     Line(points = {{48, 6}, {142.5, 6}, {142.5, 22}, {161, 22}}, color = {0, 0, 127}));

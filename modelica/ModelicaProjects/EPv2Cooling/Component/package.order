@@ -2,3 +2,4 @@ MotorCoolingModule
 InvertorCoolingModule
 ProfileGenerator
 Real3ToArray
+CoilTCR

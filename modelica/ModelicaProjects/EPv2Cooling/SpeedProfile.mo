@@ -26,6 +26,12 @@ model SpeedProfile
     Placement(transformation(origin = {300, -4}, extent = {{10, -10}, {-10, 10}})));
   ModelicaProjects.EPv2Cooling.Component.ProfileGenerator profileGenerator annotation(
     Placement(transformation(origin = {218, -4}, extent = {{20, -20}, {-20, 20}})));
+  Modelica.Blocks.Tables.CombiTable1Ds combiTable1Ds(table = [0, 100; 1, 110; 2, 110])  annotation(
+    Placement(transformation(origin = {24, -82}, extent = {{-10, -10}, {10, 10}})));
+  Modelica.Blocks.Sources.Constant const(k = 0.5)  annotation(
+    Placement(transformation(origin = {-40, -82}, extent = {{-10, -10}, {10, 10}})));
+  EAST.Blocks.Routing.ExtractScalar extractScalar1 annotation(
+    Placement(transformation(origin = {70, -82}, extent = {{-10, -10}, {10, 10}})));
 equation
   connect(rpmTable.y[1], speed.w_ref) annotation(
     Line(points = {{-71, 72}, {-41.5, 72}, {-41.5, 70}, {-12, 70}}, color = {0, 0, 127}));
@@ -35,6 +41,10 @@ equation
     Line(points = {{329, -4}, {312, -4}}, color = {0, 0, 127}, thickness = 0.5));
   connect(profileGenerator.u, extractScalar.y) annotation(
     Line(points = {{242, -4}, {290, -4}}, color = {0, 0, 127}));
+  connect(const.y, combiTable1Ds.u) annotation(
+    Line(points = {{-28, -82}, {12, -82}}, color = {0, 0, 127}));
+  connect(combiTable1Ds.y, extractScalar1.u) annotation(
+    Line(points = {{36, -82}, {58, -82}}, color = {0, 0, 127}, thickness = 0.5));
   annotation(
     experiment(StopTime = 180),
     Diagram(coordinateSystem(extent = {{-220, 100}, {180, -160}}), graphics = {Text(origin = {366, -4}, extent = {{-14, 8}, {14, -8}}, textString = "LOX"), Text(origin = {273, 5}, extent = {{-13, 5}, {13, -5}}, textString = "rpm")}));

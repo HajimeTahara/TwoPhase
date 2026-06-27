@@ -40,62 +40,68 @@ model MotorCoolingModule
     Placement(transformation(origin = {-2, -106}, extent = {{90, -10}, {110, 10}}), iconTransformation(extent = {{90, -10}, {110, 10}})));
   EAST.TwoPhaseFlow.Component.Pipes.DynamicPipeSegment pipe(redeclare package Medium = Medium, p_start = p_init_pipe, h_start = Medium.specificEnthalpy_pT(p_init_pipe, T_init_pipe), geometry = EAST.TwoPhaseFlow.Component.Pipes.PipeGeometry.Rectangular, length = pipe_L, rectangularLongSide = pipe_W_long, rectangularShortSide = pipe_W_short) annotation(
     Placement(transformation(origin = {-92, -106}, extent = {{-10, -10}, {10, 10}})));
-  EAST.Thermal.HeatTransfer.Components.CylindricalThermalConductor cylindricalThermalConductor(use_heat_input = true, nLayers = nLayer, innerDiameter = D_inner, outerDiameter = {D_coil, D_core, D_frame}, L = L_motor/nNode, material = {coil, core, frame}, T_start = fill(T_init_motor, nLayer), use_temperature_output = true) annotation(
+  EAST.Thermal.HeatTransfer.Components.CylindricalThermalConductor stator(use_heat_input = true, nLayers = nLayer, innerDiameter = D_inner, outerDiameter = {D_coil, D_core, D_frame}, L = L_motor/nNode, material = {coil, core, frame}, T_start = fill(T_init_motor, nLayer), use_temperature_output = true) annotation(
     Placement(transformation(origin = {-89, 37}, extent = {{-19, -19}, {19, 19}}, rotation = -90)));
   EAST.TwoPhaseFlow.Component.Pipes.DynamicPipeSegment pipe1(redeclare package Medium = Medium, geometry = EAST.TwoPhaseFlow.Component.Pipes.PipeGeometry.Rectangular, h_start = Medium.specificEnthalpy_pT(p_init_pipe, T_init_pipe), length = pipe_L, p_start = p_init_pipe, rectangularLongSide = pipe_W_long, rectangularShortSide = pipe_W_short) annotation(
     Placement(transformation(origin = {-26, -106}, extent = {{-10, -10}, {10, 10}})));
   EAST.TwoPhaseFlow.Component.Pipes.DynamicPipeSegment pipe2(redeclare package Medium = Medium, geometry = EAST.TwoPhaseFlow.Component.Pipes.PipeGeometry.Rectangular, h_start = Medium.specificEnthalpy_pT(p_init_pipe, T_init_pipe), length = pipe_L, p_start = p_init_pipe, rectangularLongSide = pipe_W_long, rectangularShortSide = pipe_W_short) annotation(
     Placement(transformation(origin = {36, -106}, extent = {{-10, -10}, {10, 10}})));
-  EAST.Thermal.HeatTransfer.Components.CylindricalThermalConductor cylindricalThermalConductor1(L = L_motor/nNode, innerDiameter = D_inner, material = {coil, core, frame}, nLayers = nLayer, outerDiameter = {D_coil, D_core, D_frame}, use_heat_input = true, T_start = fill(T_init_motor, nLayer), use_temperature_output = true) annotation(
+  EAST.Thermal.HeatTransfer.Components.CylindricalThermalConductor stator1(L = L_motor/nNode, innerDiameter = D_inner, material = {coil, core, frame}, nLayers = nLayer, outerDiameter = {D_coil, D_core, D_frame}, use_heat_input = true, T_start = fill(T_init_motor, nLayer), use_temperature_output = true) annotation(
     Placement(transformation(origin = {-27, -13}, extent = {{-19, -19}, {19, 19}}, rotation = -90)));
-  EAST.Thermal.HeatTransfer.Components.CylindricalThermalConductor cylindricalThermalConductor11(L = L_motor/nNode, innerDiameter = D_inner, material = {coil, core, frame}, nLayers = nLayer, outerDiameter = {D_coil, D_core, D_frame}, use_heat_input = true, T_start = fill(T_init_motor, nLayer), use_temperature_output = true) annotation(
+  EAST.Thermal.HeatTransfer.Components.CylindricalThermalConductor stator2(L = L_motor/nNode, innerDiameter = D_inner, material = {coil, core, frame}, nLayers = nLayer, outerDiameter = {D_coil, D_core, D_frame}, use_heat_input = true, T_start = fill(T_init_motor, nLayer), use_temperature_output = true) annotation(
     Placement(transformation(origin = {35, -59}, extent = {{-19, -19}, {19, 19}}, rotation = -90)));
   EAST.Blocks.Interfaces.RealVectorInput u[3] annotation(
     Placement(transformation(origin = {126, 105}, extent = {{-10, -11}, {10, 11}}), iconTransformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}})));
   EAST.Blocks.Math.VectorScalarArithmetic vectorScalarArithmetic(n = nNode, operation = EAST.Blocks.Types.VectorScalarOperation.Divide)  annotation(
+    HideResult = true,
     Placement(transformation(origin = {98, 76}, extent = {{10, -10}, {-10, 10}})));
   Modelica.Blocks.Sources.Constant const(k = nNode)  annotation(
+    HideResult = true,
     Placement(transformation(origin = {96, 36}, extent = {{-10, -10}, {10, 10}})));
   Modelica.Blocks.Interfaces.RealOutput coilTemperature annotation(
     Placement(transformation(origin = {294, -76}, extent = {{-10, -10}, {10, 10}}), iconTransformation(origin = {92, 80}, extent = {{-10, -10}, {10, 10}}, rotation = 90)));
   EAST.Blocks.Math.ElementWiseAdd elementWiseAdd(n = nLayer) annotation(
+    HideResult = true,
     Placement(transformation(origin = {154, -50}, extent = {{-10, -10}, {10, 10}})));
   EAST.Blocks.Math.VectorScalarArithmetic vectorScalarArithmetic1(n = nLayer, operation = EAST.Blocks.Types.VectorScalarOperation.Divide)  annotation(
+    HideResult = true,
     Placement(transformation(origin = {208, -76}, extent = {{-10, -10}, {10, 10}})));
   EAST.Blocks.Math.ElementWiseAdd elementWiseAdd1(n = nLayer) annotation(
+    HideResult = true,
     Placement(transformation(origin = {112, -18}, extent = {{-10, -10}, {10, 10}})));
   EAST.Blocks.Routing.ExtractScalar extractScalar(n = nLayer, index = 1)  annotation(
+    HideResult = true,
     Placement(transformation(origin = {248, -76}, extent = {{-10, -10}, {10, 10}})));
 equation
-  connect(cylindricalThermalConductor.port_outer, pipe.heatPort) annotation(
+  connect(stator.port_outer, pipe.heatPort) annotation(
     Line(points = {{-89, 18}, {-89, -60}, {-92, -60}, {-92, -102}}, color = {191, 0, 0}));
   connect(pipe.port_b, pipe1.port_a) annotation(
     Line(points = {{-82, -106}, {-36, -106}}, color = {0, 0, 127}));
   connect(pipe1.port_b, pipe2.port_a) annotation(
     Line(points = {{-16, -106}, {26, -106}}, color = {0, 0, 127}));
-  connect(cylindricalThermalConductor11.port_outer, pipe2.heatPort) annotation(
+  connect(stator2.port_outer, pipe2.heatPort) annotation(
     Line(points = {{35, -78}, {35, -80}, {36, -80}, {36, -102}}, color = {191, 0, 0}));
-  connect(cylindricalThermalConductor1.port_outer, pipe1.heatPort) annotation(
+  connect(stator1.port_outer, pipe1.heatPort) annotation(
     Line(points = {{-27, -32}, {-26, -32}, {-26, -102}}, color = {191, 0, 0}));
   connect(port_a, pipe.port_a) annotation(
     Line(points = {{-148, -106}, {-102, -106}}, color = {0, 127, 255}));
   connect(pipe2.port_b, port_b) annotation(
     Line(points = {{46, -106}, {98, -106}}, color = {0, 0, 127}));
-  connect(cylindricalThermalConductor.Q_gen_input, vectorScalarArithmetic.y) annotation(
+  connect(stator.Q_gen_input, vectorScalarArithmetic.y) annotation(
     Line(points = {{-66, 37}, {-24.2, 37}, {-24.2, 75}, {86.8, 75}}, color = {0, 0, 127}, thickness = 0.5));
-  connect(cylindricalThermalConductor1.Q_gen_input, vectorScalarArithmetic.y) annotation(
+  connect(stator1.Q_gen_input, vectorScalarArithmetic.y) annotation(
     Line(points = {{-4.2, -13}, {11.8, -13}, {11.8, 75}, {86.8, 75}}, color = {0, 0, 127}, thickness = 0.5));
-  connect(cylindricalThermalConductor11.Q_gen_input, vectorScalarArithmetic.y) annotation(
+  connect(stator2.Q_gen_input, vectorScalarArithmetic.y) annotation(
     Line(points = {{57.8, -59}, {69.8, -59}, {69.8, 75}, {87.8, 75}}, color = {0, 0, 127}, thickness = 0.5));
   connect(vectorScalarArithmetic.u, u) annotation(
     Line(points = {{110, 82}, {126, 82}, {126, 106}}, color = {0, 0, 127}, thickness = 0.5));
   connect(const.y, vectorScalarArithmetic.k) annotation(
     Line(points = {{107, 36}, {126, 36}, {126, 70}, {110, 70}}, color = {0, 0, 127}));
-  connect(cylindricalThermalConductor.layerTemperature, elementWiseAdd1.u1) annotation(
+  connect(stator.layerTemperature, elementWiseAdd1.u1) annotation(
     Line(points = {{-66, 52}, {41.8, 52}, {41.8, -11.8}, {99.8, -11.8}}, color = {0, 0, 127}, thickness = 0.5));
-  connect(cylindricalThermalConductor1.layerTemperature, elementWiseAdd1.u2) annotation(
+  connect(stator1.layerTemperature, elementWiseAdd1.u2) annotation(
     Line(points = {{-4.2, 2.2}, {23.8, 2.2}, {23.8, -23.8}, {99.8, -23.8}}, color = {0, 0, 127}, thickness = 0.5));
-  connect(cylindricalThermalConductor11.layerTemperature, elementWiseAdd.u2) annotation(
+  connect(stator2.layerTemperature, elementWiseAdd.u2) annotation(
     Line(points = {{57.8, -43.8}, {85.8, -43.8}, {85.8, -55.8}, {141.8, -55.8}}, color = {0, 0, 127}, thickness = 0.5));
   connect(elementWiseAdd1.y, elementWiseAdd.u1) annotation(
     Line(points = {{123, -18}, {131, -18}, {131, -44}, {141, -44}}, color = {0, 0, 127}, thickness = 0.5));
